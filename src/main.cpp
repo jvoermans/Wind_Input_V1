@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <BMP388_DEV.h>                           // Include the BMP388_DEV.h library, pressure sensor
+#include <Adafruit_ISM330DHCX.h>
 
 void setup() {
   // put your setup code here, to run once:

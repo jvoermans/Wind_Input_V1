@@ -1,0 +1,12 @@
+[submodule "lib/BMP388_DEV"]
+	path = lib/BMP388_DEV
+	url = https://github.com/MartinL1/BMP388_DEV.git
+[submodule "lib/Adafruit_LSM6DS"]
+	path = lib/Adafruit_LSM6DS
+	url = https://github.com/adafruit/Adafruit_LSM6DS.git
+[submodule "lib/Adafruit_BusIO"]
+	path = lib/Adafruit_BusIO
+	url = https://github.com/adafruit/Adafruit_BusIO.git
+[submodule "lib/Adafruit_Sensor"]
+	path = lib/Adafruit_Sensor
+	url = https://github.com/adafruit/Adafruit_Sensor.git
