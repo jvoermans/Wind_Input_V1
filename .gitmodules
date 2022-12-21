@@ -16,3 +16,6 @@
 [submodule "lib/SdFat"]
 	path = lib/SdFat
 	url = git@github.com:greiman/SdFat.git
+[submodule "Adafruit_GPS"]
+	path = Adafruit_GPS
+	url = git@github.com:adafruit/Adafruit_GPS.git

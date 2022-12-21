@@ -3,12 +3,18 @@
 #include <SPI.h>
 #include <BMP388_DEV.h>                           // Include the BMP388_DEV.h library, pressure sensor
 #include <Adafruit_ISM330DHCX.h>
+#include <Adafruit_GPS.h>
 
 // ETL
 #define ETL_NO_STL
 #include "Embedded_Template_Library.h"
 #include "etl/vector.h"
-etl::vector<float, 1000> pres1_vec;           //initialize pres1 vector
+etl::vector<float, 100> pres1_vec;           //initialize pres1 vector
+
+//GPS
+#define GPSSerial Serial1
+Adafruit_GPS GPS(&GPSSerial);
+#define GPSECHO false
 
 //Pressure sensor
 float temperature1, pressure1, altitude1;            // Create the temperature, pressure and altitude variables
@@ -23,6 +29,7 @@ Adafruit_ISM330DHCX ism330dhcx;
 unsigned long currentMillis;
 unsigned long previousMillis;
 const unsigned long dT = 50;        //sampling frequency f=1/dT
+uint32_t timer = millis();
 
 // SD Card
 #include "SdFat.h"
@@ -32,6 +39,7 @@ File myFile;
 SdFat SD;
 
 int count = 0;
+int count2 = 0;
 
 //Print vector to Serial
 template <typename T>
@@ -89,6 +97,11 @@ void setup() {
   ism330dhcx.configInt1(false, false, true); // accelerometer DRDY on INT1
   ism330dhcx.configInt2(false, true, false); // gyro DRDY on INT2
 
+  // GPS
+  GPS.begin(9600);
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+
   // SD card
   if (!SD.begin(SD_CS_PIN, SD_SPI_MHZ)) {
     return;
@@ -100,7 +113,7 @@ void setup() {
 
 void loop() {
 
-  while (count<1000) {
+  while (count<100) {
     currentMillis = millis();
     if (currentMillis - previousMillis >= dT)
     { previousMillis = currentMillis; //update timer
@@ -136,7 +149,7 @@ void loop() {
     }
   }
 
-  while (count==1000) {
+  while (count==100) {
   //print vector
     print_vector(pres1_vec);
     Serial.println(millis()); //check how long it takes to write vector to SD card
@@ -145,4 +158,48 @@ void loop() {
     count++;
     myFile.close();
   }
+
+  // read data from the GPS in the 'main loop'
+  char c = GPS.read();
+  // if you want to debug, this is a good time to do it!
+  if (GPSECHO)
+    if (c) Serial.print(c);
+  // if a sentence is received, we can check the checksum, parse it...
+  if (GPS.newNMEAreceived()) {
+    // a tricky thing here is if we print the NMEA sentence, or data
+    // we end up not listening and catching other sentences!
+    // so be very wary if using OUTPUT_ALLDATA and trying to print out data
+    Serial.println(GPS.lastNMEA()); // this also sets the newNMEAreceived() flag to false
+    if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
+      return; // we can fail to parse a sentence in which case we should just wait for another
+  }
+
+  // approximately every 2 seconds or so, print out the current stats
+  if (millis() - timer > 2000) {
+    timer = millis(); // reset the timer
+    Serial.print("\nTime: ");
+    if (GPS.hour < 10) { Serial.print('0'); }
+    Serial.print(GPS.hour, DEC); Serial.print(':');
+    if (GPS.minute < 10) { Serial.print('0'); }
+    Serial.print(GPS.minute, DEC); Serial.print(':');
+    if (GPS.seconds < 10) { Serial.print('0'); }
+    Serial.print(GPS.seconds, DEC); Serial.print('.');
+    if (GPS.milliseconds < 10) {
+      Serial.print("00");
+    } else if (GPS.milliseconds > 9 && GPS.milliseconds < 100) {
+      Serial.print("0");
+    }
+    Serial.println(GPS.milliseconds);
+    Serial.print("Date: ");
+    Serial.print(GPS.day, DEC); Serial.print('/');
+    Serial.print(GPS.month, DEC); Serial.print("/20");
+    Serial.println(GPS.year, DEC);
+    Serial.print("Fix: "); Serial.print((int)GPS.fix);
+    Serial.print(" quality: "); Serial.println((int)GPS.fixquality);
+    Serial.print("Location: ");
+    Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
+    Serial.print(", ");
+    Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
+  }
+
 }
