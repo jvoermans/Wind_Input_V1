@@ -5,11 +5,24 @@
 #include <Adafruit_ISM330DHCX.h>
 #include <Adafruit_GPS.h>
 
+//General
+const unsigned long Fs = 20;        //sampling frequency in Hz
+const unsigned long duration = 10;   //measurement duration in seconds
+int count = 0;                      //counter
+
 // ETL
 #define ETL_NO_STL
 #include "Embedded_Template_Library.h"
 #include "etl/vector.h"
-etl::vector<float, 100> pres1_vec;           //initialize pres1 vector
+etl::vector<unsigned long, Fs*duration> vec_time; //initialize timestamp vector
+etl::vector<float, Fs*duration> vec_P1;           //initialize pressure 1 vector
+etl::vector<float, Fs*duration> vec_P2;           //initialize pressure 2 vector
+etl::vector<float, Fs*duration> vec_Ax;           //initialize AccX vector
+etl::vector<float, Fs*duration> vec_Ay;           //initialize AccY vector
+etl::vector<float, Fs*duration> vec_Az;           //initialize AccZ vector
+etl::vector<float, Fs*duration> vec_Gx;           //initialize GyroX vector
+etl::vector<float, Fs*duration> vec_Gy;           //initialize GyroY vector
+etl::vector<float, Fs*duration> vec_Gz;           //initialize GyroZ vector
 
 //GPS
 #define GPSSerial Serial1
@@ -28,7 +41,6 @@ Adafruit_ISM330DHCX ism330dhcx;
 //Timer
 unsigned long currentMillis;
 unsigned long previousMillis;
-const unsigned long dT = 50;        //sampling frequency f=1/dT
 uint32_t timer = millis();
 
 // SD Card
@@ -37,9 +49,6 @@ uint32_t timer = millis();
 #define SD_CS_PIN 8
 File myFile;
 SdFat SD;
-
-int count = 0;
-int count2 = 0;
 
 //Print vector to Serial
 template <typename T>
@@ -52,17 +61,6 @@ void print_vector(etl::ivector<T> const & vec_in)
     Serial.print(F(" | "));
   }
   Serial.println();
-}
-
-//write vector to SD
-template <typename T>
-void write_vector(etl::ivector<T> const & vec_in)
-{
-  myFile.println(F("print vector"));
-  for (T const & elem : vec_in) 
-  {
-    myFile.println(elem);
-  }
 }
 
 void setup() {
@@ -113,10 +111,10 @@ void setup() {
 
 void loop() {
 
-  while (count<100) {
+  while (count<Fs*duration) {
     currentMillis = millis();
-    if (currentMillis - previousMillis >= dT)
-    { previousMillis = currentMillis; //update timer
+    if (currentMillis - previousMillis >= 1000UL/Fs)        //note 1000/Fs is dT, time difference between measurements
+    { previousMillis = currentMillis;                       //update timer
 
       bmp1.getMeasurements(temperature1, pressure1, altitude1);
       bmp2.getMeasurements(temperature2, pressure2, altitude2);
@@ -126,39 +124,37 @@ void loop() {
       sensors_event_t temp;
       ism330dhcx.getEvent(&accel, &gyro, &temp);
 
-      pres1_vec.push_back(pressure1);
+      vec_time.push_back(millis());
+      vec_P1.push_back(pressure1); //note, pressure in hPa
+      vec_P2.push_back(pressure2);
+      vec_Ax.push_back(accel.acceleration.x);
+      vec_Ay.push_back(accel.acceleration.y);
+      vec_Az.push_back(accel.acceleration.z);
+      vec_Gx.push_back(gyro.gyro.x);
+      vec_Gy.push_back(gyro.gyro.y);
+      vec_Gz.push_back(gyro.gyro.z);
 
-      Serial.print(millis());
-      Serial.print(" ");
-      Serial.print(accel.acceleration.x);
-      Serial.print(" ");
-      Serial.print(accel.acceleration.y);
-      Serial.print(" ");
-      Serial.print(accel.acceleration.z);
-      Serial.print(" ");
-      Serial.print(gyro.gyro.x);
-      Serial.print(" ");
-      Serial.print(gyro.gyro.y);
-      Serial.print(" ");
-      Serial.print(gyro.gyro.z);
-      Serial.print(" ");
-      Serial.print(pressure1,4);  //print pressure in hPa
-      Serial.print(" ");
-      Serial.println(pressure2,4);  //print pressure in hPa
+      Serial.print(count);          //Just to make clear it is doing something
+      Serial.print(F("/"));
+      Serial.println(Fs*duration);
+
       count++;
     }
   }
 
-  while (count==100) {
+  while (count==Fs*duration) {
   //print vector
-    print_vector(pres1_vec);
-    Serial.println(millis()); //check how long it takes to write vector to SD card
-    write_vector(pres1_vec);
-    Serial.println(millis());
+    print_vector(vec_P1);
+    Serial.println("");
+    Serial.println(vec_P1.size(),4);  // 4 decimals would be good
+
+    print_vector(vec_Az);
+    Serial.println("");
+    Serial.println(vec_Az.size());
     count++;
-    myFile.close();
   }
 
+//Some continuous GPS reading, every 2 sec, taken from Adafruit library
   // read data from the GPS in the 'main loop'
   char c = GPS.read();
   // if you want to debug, this is a good time to do it!
