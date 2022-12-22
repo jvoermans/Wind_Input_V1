@@ -4,6 +4,7 @@
 #include <BMP388_DEV.h>                           // Include the BMP388_DEV.h library, pressure sensor
 #include <Adafruit_ISM330DHCX.h>
 #include <Adafruit_GPS.h>
+#include "ard_supers/avr/dtostrf.h"
 
 //General
 const unsigned long Fs = 20;        //sampling frequency in Hz
@@ -59,6 +60,27 @@ void print_vector(etl::ivector<T> const & vec_in)
   {
     Serial.print(elem);
     Serial.print(F(" | "));
+  }
+  Serial.println();
+}
+
+template <typename T>
+void write_vector(etl::ivector<T> const & vec_in)
+{ 
+  char buffer[512]={'\0'};
+  char data_float[8];
+  int count_loop=0;
+  for (T const & elem : vec_in) 
+  {
+    dtostrf(elem, 8, 4, data_float);
+    strcat(buffer,data_float);
+    strcat(buffer,";");
+    count_loop++;
+    if (count_loop > 10) {
+      Serial.println(buffer);
+      strcpy(buffer,"");
+      count_loop=0;
+    }
   }
   Serial.println();
 }
@@ -142,6 +164,7 @@ void loop() {
     }
   }
 
+  //One-time printing of vectors for checking
   while (count==Fs*duration) {
   //print vector
     print_vector(vec_P1);
@@ -151,8 +174,12 @@ void loop() {
     print_vector(vec_Az);
     Serial.println("");
     Serial.println(vec_Az.size());
+
+    // write_vector(vec_P1);
     count++;
   }
+
+  
 
 //Some continuous GPS reading, every 2 sec, taken from Adafruit library
   // read data from the GPS in the 'main loop'
