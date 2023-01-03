@@ -19,3 +19,6 @@
 [submodule "Adafruit_GPS"]
 	path = Adafruit_GPS
 	url = git@github.com:adafruit/Adafruit_GPS.git
+[submodule "lib/kiss_clang_posix_time_utils"]
+	path = lib/kiss_clang_posix_time_utils
+	url = git@github.com:jerabaul29/kiss_clang_posix_time_utils.git
