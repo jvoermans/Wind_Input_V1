@@ -62,14 +62,13 @@ class GNSS_simple_manager{
 
         // is it started, like, has it been initialized including the UART, settings etc?
         bool started {false};
-
-        GNSS_simple_fix current_working_GNSS_simple_fix;
-
 };
 
 extern Adafruit_GPS adafruit_gps_instance;
 
 extern GNSS_simple_manager gnss_simple_manager_instance;
+
+extern GNSS_simple_fix current_working_GNSS_simple_fix;
 
 // continuous GNSS measurement would likely only be helpful in order to get an absolute time reference that can be used to correlated in time
 // but are not critical to have at the moment

@@ -9,8 +9,18 @@
 #include "firmware_configuration.h"
 #include "user_configuration.h"
 
+#include "gnss_manager.h"
+
+uint8_t status {255};
+
 void setup()
 {
+    ////////////////////////////////////////////////////////////////////////////////
+    // startup delay, to avoid super fast restarts etc
+    delay(5000);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // setup watchdog
     // for wdt setup see: https://github.com/sparkfun/Arduino_Apollo3/blob/main/libraries/WDT/examples/Example2_WDT_Config/Example2_WDT_Config.ino
     // wdt generate tics at 1 second
     // generate a wdt interrupt every 32 tics (we do not use it anyways)
@@ -19,6 +29,8 @@ void setup()
     wdt.start();
     // from now on, need to wdt.restart(); at least every 32 seconds, else reboot
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // start USB and standard prints, if relevant
     if (use_usb){
         SERIAL_USB->begin(BAUD_RATE_USB);
         delay(100);
@@ -29,6 +41,23 @@ void setup()
         print_all_user_configs();
         wdt.restart();
     }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // TODO: start / check the different sensors to check that all looks good
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // init the GNSS, get the first GNSS fix;
+    // if not GNSS fix, simply go to sleep for 15 minutes before re-trying
+    // (note: the GNSS cannot be fully turned out, only put to standby, so not sure
+    // how power efficient the sleep actually is, but cannot hurt to sleep)
+    status = 255;
+
+    while (status != 0){
+        status = gnss_simple_manager_instance.get_good_simple_fix(current_working_GNSS_simple_fix);
+        // TODO: sleep manager
+        // TODO: blink LED when well active vs sleep etc - may likely not reach very low power on redboard artemis anyways
+    }
+
 }
 
 void loop()

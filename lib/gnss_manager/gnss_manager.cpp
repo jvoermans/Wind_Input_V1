@@ -4,6 +4,8 @@ Adafruit_GPS adafruit_gps_instance(GNSS_UART);
 
 GNSS_simple_manager gnss_simple_manager_instance;
 
+GNSS_simple_fix current_working_GNSS_simple_fix;
+
 void dummy_initialize_fix(GNSS_simple_fix & to_initialize){
     to_initialize.validity_status = 255;
     to_initialize.year = 9999;
@@ -31,7 +33,7 @@ uint8_t GNSS_simple_manager::initialize(void)
         {
             if (use_usb)
             {
-                Serial.println(F("ERR: cannot .begin GNSS"));
+                SERIAL_USB->println(F("ERR: cannot .begin GNSS"));
             }
             return 1;
         }
@@ -67,7 +69,7 @@ uint8_t GNSS_simple_manager::turn_on(void)
 
         if (!bool_status){
             if (use_usb){
-                Serial.println(F("ERR: cannot .wakeup GNSS"));
+                SERIAL_USB->println(F("ERR: cannot .wakeup GNSS"));
             }
 
             return 2;
@@ -108,7 +110,8 @@ uint8_t GNSS_simple_manager::get_good_simple_fix(GNSS_simple_fix & output_fix){
     }
 
     // get the first fix with the first fix timeout
-    status = get_single_fix();
+    // TODO: continue from here
+    // status = get_single_fix();
 
     // get and discard a few more fixes within the update timeout for each of them
 
