@@ -1,0 +1,4 @@
+- setup of the coding environment: see https://github.com/jerabaul29/OpenMetBuoy-v2021a/blob/main/development_environment/setup_platformio_environment/Instructions.md
+- compiling on:
+  - linux: in platformio.ini, use the linux-only subsection flags for the build_flags
+  - other: in platformio.ini, use the dummy subsection flags for the build_flags

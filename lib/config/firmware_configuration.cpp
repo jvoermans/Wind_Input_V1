@@ -6,6 +6,10 @@
 Uart * SERIAL_USB {&Serial};
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// gnss related
+Uart * GNSS_UART {&Serial1};
+
+//////////////////////////////////////////////////////////////////////////////////////////
 // functions
 
 void print_firmware_config(void){
@@ -13,8 +17,9 @@ void print_firmware_config(void){
     SERIAL_USB->print(F("Compiled: "));
     SERIAL_USB->print(F(__DATE__));
     SERIAL_USB->print(F(", "));
-    SERIAL_USB->print(F(__TIME__));
-    SERIAL_USB->print(F(", compiler version "));
+    // using also time will change often and make for expensive recompilation
+    // SERIAL_USB->print(F(__TIME__));
+    // SERIAL_USB->print(F(", compiler version "));
     SERIAL_USB->println(F(__VERSION__));
     SERIAL_USB->print(F("git branch: "));
     SERIAL_USB->print(F(git_branch));
