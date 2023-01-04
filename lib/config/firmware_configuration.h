@@ -23,7 +23,7 @@ extern Uart * GNSS_UART;
 // pins on the board
 // if use specific pins for specific purposes, name them here
 
-// static constexpr int some_pin_name = PIN_NUMBER; // explanation of pin use
+static constexpr int LED {13};
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // misc

@@ -8,11 +8,11 @@ void print_gnss_config(void){
     PRINTLN_VAR(gnss_fix_timeout_first_fix_milliseconds);
     PRINTLN_VAR(gnss_fix_timeout_subsequent_fix_milliseconds);
     PRINTLN_VAR(gnss_max_nbr_turn_on_attempts);
-    PRINTLN_VAR(number_gnss_fixes_to_compute_good);
+    PRINTLN_VAR(gnss_number_fixes_to_compute_good);
 }
 
 void print_logging_config(void){
-    PRINTLN_VAR(file_duration_minutes);
+    PRINTLN_VAR(file_start_modulo_seconds);
 }
 
 void print_all_user_configs(void){

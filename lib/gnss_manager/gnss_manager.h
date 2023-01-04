@@ -10,6 +10,15 @@
 
 #include <Adafruit_GPS.h>
 
+#include "Embedded_Template_Library.h"
+#include "etl/vector.h"
+
+#include "statistical_processing.h"
+
+#include "kiss_posix_time_utils.hpp"
+
+#include "time_manager.h"
+
 // "simple" fix, used for the metadata, filename setting, etc
 struct GNSS_simple_fix {
     uint8_t validity_status;  // 0 is valid fix; anything else indicate issues
@@ -20,10 +29,16 @@ struct GNSS_simple_fix {
     uint8_t minute;  // natural minute,  0-59, as would be written commonly
     int32_t latitude;
     int32_t longitude;
+    // note: not sure if the latitude and longitude from adafruit library have sign or abs, add NS and EW chars...
+    char lat_NS;
+    char lon_EW;
+    uint32_t posix_timestamp;
 };
 
 // dummy initialize a fix with clear outlier values (255 for status, and 9999, 99, or 99999 for data depending on type)
 void dummy_initialize_fix(GNSS_simple_fix & to_initialize);
+
+void copy_fix(GNSS_simple_fix const & in, GNSS_simple_fix & out);
 
 // a GNSS manager to simply:
 // get a single, valid, GNSS fix (possibly with some warmup)
@@ -37,13 +52,19 @@ void dummy_initialize_fix(GNSS_simple_fix & to_initialize);
 // 0 all good
 // 1 cannot .begin
 // 2 cannot .wakeup
+// 3 cannot get a valid fix before timeout
 // 255 empty initialized GNSS_simple_fix
 
 class GNSS_simple_manager{
     public:
-        // get a simple good fix; note that this may require taking several "raw" fixes to ensure quality
-        // this automatically starts the GNSS, takes as many raw fixes as needed to get a good fix, and stops the GNSS (to save power)
-        uint8_t get_good_simple_fix(GNSS_simple_fix & output_fix);
+        // get a good averaged fix; note that this may require taking several "raw" fixes to ensure quality
+        // this automatically starts the GNSS, takes as many raw fixes as needed to get a good average fix, and stops the GNSS (to save power)
+        uint8_t get_good_averaged_fix(GNSS_simple_fix & output_fix);
+
+        // get a good single fix; note that this may take a bit of time, as one may need to wait a bit for getting an actual fix
+        // this automatically starts the GNSS, takes as many raw fixes as needed to get a good single fix, and stops the GNSS (to save power)
+        // in addition, use this good single fix to set the RTC
+        uint8_t get_good_single_fix_and_set_rtc(GNSS_simple_fix & output_fix);
 
     private:  
         // uint8_t used as indications of internal issue; 0 is all is well, other is some issue
@@ -58,10 +79,14 @@ class GNSS_simple_manager{
 
         // get a single fix, with the GNSS already activated, within a timeout
         // this assumes that the GNSS is already turned on, and does not turn off the GNSS once a fix is gotten
-        uint8_t get_single_fix(uint32_t timeout, GNSS_simple_fix & output_fix);
+        uint8_t get_single_fix(uint32_t timeout_milliseconds, GNSS_simple_fix & output_fix);
 
         // is it started, like, has it been initialized including the UART, settings etc?
         bool started {false};
+
+        etl::vector<int32_t, gnss_number_fixes_to_compute_good> accumulator_latitude;
+        etl::vector<int32_t, gnss_number_fixes_to_compute_good> accumulator_longitude;
+        etl::vector<int32_t, gnss_number_fixes_to_compute_good> accumulator_posix;
 };
 
 extern Adafruit_GPS adafruit_gps_instance;

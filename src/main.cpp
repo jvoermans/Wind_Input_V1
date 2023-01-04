@@ -11,13 +11,16 @@
 
 #include "gnss_manager.h"
 
+#include "time_manager.h"
+#include "sleep_manager.h"
+
 uint8_t status {255};
 
 void setup()
 {
     ////////////////////////////////////////////////////////////////////////////////
     // startup delay, to avoid super fast restarts etc
-    delay(5000);
+    delay(1000);
 
     ////////////////////////////////////////////////////////////////////////////////
     // setup watchdog
@@ -53,20 +56,39 @@ void setup()
     status = 255;
 
     while (status != 0){
-        status = gnss_simple_manager_instance.get_good_simple_fix(current_working_GNSS_simple_fix);
+        status = gnss_simple_manager_instance.get_good_averaged_fix(current_working_GNSS_simple_fix);
         // TODO: sleep manager
         // TODO: blink LED when well active vs sleep etc - may likely not reach very low power on redboard artemis anyways
     }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // set the time manager
+    while(gnss_simple_manager_instance.get_good_single_fix_and_set_rtc(current_working_GNSS_simple_fix) != 0){delay(100);};
 }
 
 void loop()
 {
     ////////////////////////////////////////////////////////////////////////////////
+    // wait / sleep until next time to start a new file
+    board_time_manager.print_status();
+    uint32_t current_posix = board_time_manager.get_posix_timestamp();
+    uint32_t seconds_to_wait = file_start_modulo_seconds - (current_posix % file_start_modulo_seconds);
+    sleep_for_seconds(seconds_to_wait);
+
+    // TODO: continue here
+    delay(5000);  // dummy delay just for now
+
+    ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get start of file lat, lon, time
 
     ////////////////////////////////////////////////////////////////////////////////
+    // we need to take Kalman filter etc; boost
+
+    ////////////////////////////////////////////////////////////////////////////////
     // log data for the duration of the file
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // done need to take Kalman filter etc; deboost
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get end of file lat, lon, time
