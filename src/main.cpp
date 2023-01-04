@@ -55,10 +55,16 @@ void setup()
     // how power efficient the sleep actually is, but cannot hurt to sleep)
     status = 255;
 
-    while (status != 0){
+    while (true){
         status = gnss_simple_manager_instance.get_good_averaged_fix(current_working_GNSS_simple_fix);
-        // TODO: sleep manager
-        // TODO: blink LED when well active vs sleep etc - may likely not reach very low power on redboard artemis anyways
+        
+        // if we got a fix, exit the loop
+        if (status == 0){
+            break;
+        }
+
+        // else sleep a bit and try again later
+        sleep_for_seconds(15*60);
     }
 
     ////////////////////////////////////////////////////////////////////////////////
