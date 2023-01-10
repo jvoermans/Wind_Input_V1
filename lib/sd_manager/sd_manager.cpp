@@ -94,3 +94,11 @@ void SD_Manager::update_filename(GNSS_simple_fix const &fix_in)
     sd_filename[19] = 't';
     sd_filename[20] = '\0';
 }
+
+void SD_Manager::log_boot(void){
+
+}
+
+void SD_Manager::log_data(void){
+
+}

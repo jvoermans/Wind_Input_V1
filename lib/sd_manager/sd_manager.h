@@ -3,6 +3,7 @@
 
 #include "firmware_configuration.h"
 #include "user_configuration.h"
+#include "sd_configuration.h"
 
 #include "gnss_manager.h"
 

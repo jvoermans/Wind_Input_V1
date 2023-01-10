@@ -14,6 +14,7 @@
 #include "time_manager.h"
 #include "sleep_manager.h"
 
+#include "sd_configuration.h"
 #include "sd_manager.h"
 
 #include "data_manager.h"
