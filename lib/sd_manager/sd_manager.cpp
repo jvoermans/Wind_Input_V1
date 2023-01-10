@@ -96,9 +96,38 @@ void SD_Manager::update_filename(GNSS_simple_fix const &fix_in)
 }
 
 void SD_Manager::log_boot(void){
+    start();
+    delay(100);
+    wdt.restart();
 
+    sd_file.write("\nBOOT\nGNSS dump\n");
+    sd_file.write((void *)(&current_fix_start), sizeof(GNSS_simple_fix));
+    sd_file.write("\ndone\n");
+    delay(100);
+    wdt.restart();
+
+    stop();
+    delay(100);
+    wdt.restart();
 }
 
 void SD_Manager::log_data(void){
+    start();
+    delay(100);
+    wdt.restart();
 
+    sd_file.write("\nDATA\nGNSS start\n");
+    wdt.restart();
+    sd_file.write((void *)(&current_fix_start), sizeof(GNSS_simple_fix));
+    wdt.restart();
+    sd_file.write("\ndone\nGNSS end\n");
+    wdt.restart();
+    sd_file.write((void *)(&current_fix_start), sizeof(GNSS_simple_fix));
+    wdt.restart();
+    sd_file.write("\ndone\n");
+    wdt.restart();
+
+    stop();
+    delay(100);
+    wdt.restart();
 }

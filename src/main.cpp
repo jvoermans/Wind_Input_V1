@@ -58,10 +58,14 @@ void setup()
     // if not GNSS fix, simply go to sleep for 15 minutes before re-trying
     // (note: the GNSS cannot be fully turned out, only put to standby, so not sure
     // how power efficient the sleep actually is, but cannot hurt to sleep)
+    if (use_usb){
+        SERIAL_USB->println(F("init GPS, get first fix"));
+    }
+
     status = 255;
 
     while (true){
-        status = gnss_simple_manager_instance.get_good_averaged_fix(current_working_GNSS_simple_fix);
+        status = gnss_simple_manager_instance.get_good_averaged_fix(current_fix_start);
         
         // if we got a fix, exit the loop
         if (status == 0){
@@ -74,22 +78,47 @@ void setup()
 
     ////////////////////////////////////////////////////////////////////////////////
     // set the time manager
+    if (use_usb){
+        SERIAL_USB->println(F("init time manager, set time"));
+    }
     // TODO: BONUS: if too many failures, either reboot or just go further
-    while(gnss_simple_manager_instance.get_good_single_fix_and_set_rtc(current_working_GNSS_simple_fix) != 0){delay(1000);};
+    while(gnss_simple_manager_instance.get_good_single_fix_and_set_rtc(current_fix_start) != 0){delay(1000);};
 
     ////////////////////////////////////////////////////////////////////////////////
     // log a boot message
-    sd_manager_instance.update_filename(current_working_GNSS_simple_fix);
+    if (use_usb){
+        SERIAL_USB->println(F("write boot message"));
+    }
+    sd_manager_instance.update_filename(current_fix_start);
     sd_manager_instance.log_boot();
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // done setup
+    if (use_usb){
+        SERIAL_USB->println(F("done setup"));
+    }
 }
 
 void loop()
 {
     ////////////////////////////////////////////////////////////////////////////////
+    // done setup
+    if (use_usb){
+        SERIAL_USB->println(F("start loop"));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
     // wait / sleep until next time to start a new file
     board_time_manager.print_status();
     uint32_t current_posix = board_time_manager.get_posix_timestamp();
     uint32_t seconds_to_wait = file_start_modulo_seconds - (current_posix % file_start_modulo_seconds);
+
+    if (use_usb){
+        SERIAL_USB->print(F("sleep for (s): ")); SERIAL_USB->println(seconds_to_wait);
+    }
+    wdt.restart();
+    delay(100);
+
     sleep_for_seconds(seconds_to_wait);
 
     if (use_usb){
@@ -99,6 +128,10 @@ void loop()
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get start of file lat, lon, time
+    if (use_usb){
+        SERIAL_USB->println(F("get start fix"));
+    }
+    wdt.restart();
     // TODO: BONUS: if too many failures, either reboot or just go further
     while (gnss_simple_manager_instance.get_good_averaged_fix(current_fix_start) != 0){
         delay(1000);
@@ -111,6 +144,9 @@ void loop()
 
     ////////////////////////////////////////////////////////////////////////////////
     // log data for the duration of the file
+    if (use_usb){
+        SERIAL_USB->println(F("log data"));
+    }
 
     delay(5000);  // dummy delay just for now
     wdt.restart();
@@ -121,14 +157,23 @@ void loop()
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get end of file lat, lon, time
+    if (use_usb){
+        SERIAL_USB->println(F("get end fix"));
+    }
     // TODO: BONUS: if too many failures, either reboot or just go further
     while (gnss_simple_manager_instance.get_good_averaged_fix(current_fix_end) != 0){
         delay(1000);
+        wdt.restart();
     }
 
     ////////////////////////////////////////////////////////////////////////////////
     // sd card dumping
+    if (use_usb){
+        SERIAL_USB->println(F("dump data"));
+    }
     sd_manager_instance.update_filename(current_fix_start);
     sd_manager_instance.log_data();
 
+    wdt.restart();
+    delay(100);
 }

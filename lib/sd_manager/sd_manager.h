@@ -12,6 +12,8 @@
 
 #include "watchdog_manager.h"
 
+#include "data_manager.h"
+
 class SD_Manager{
     public:
         // filename is in the format YYYY-MM-DD-HH-MM.dat
