@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "macro_utils.h"
 #include "print_utils.h"
+#include "SdFat.h"
 
 // this is what the user typically does not want to change, like what port is used for what, etc
 // this should not really be possible to change without changing the hardware (except for a few misc)
@@ -24,6 +25,21 @@ extern Uart * GNSS_UART;
 // if use specific pins for specific purposes, name them here
 
 static constexpr int LED {13};
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// SD card stuff
+
+// pins on the board and frequency for the SD card
+static constexpr int SD_CS_PIN {8};
+static constexpr int SD_SPI_MHZ {12};
+
+// which kind of card format is used
+// this is what works on my 32 GB SD card
+typedef SdFs sd_t;
+typedef FsFile file_t;
+// may need to use ExFat so that can have large SD cards
+// typedef SdExFat sd_t;
+// typedef ExFile file_t;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // misc

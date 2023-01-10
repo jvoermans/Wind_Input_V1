@@ -14,6 +14,10 @@
 #include "time_manager.h"
 #include "sleep_manager.h"
 
+#include "sd_manager.h"
+
+#include "data_manager.h"
+
 uint8_t status {255};
 
 void setup()
@@ -46,7 +50,7 @@ void setup()
     }
 
     ////////////////////////////////////////////////////////////////////////////////
-    // TODO: start / check the different sensors to check that all looks good
+    // TODO: CRITICAL: start / check the different sensors and the SD card to check that all looks good
 
     ////////////////////////////////////////////////////////////////////////////////
     // init the GNSS, get the first GNSS fix;
@@ -69,8 +73,13 @@ void setup()
 
     ////////////////////////////////////////////////////////////////////////////////
     // set the time manager
-    // TODO: if too many failures, either reboot or just go further
+    // TODO: BONUS: if too many failures, either reboot or just go further
     while(gnss_simple_manager_instance.get_good_single_fix_and_set_rtc(current_working_GNSS_simple_fix) != 0){delay(1000);};
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // log a boot message
+    sd_manager_instance.update_filename(current_working_GNSS_simple_fix);
+    sd_manager_instance.log_boot();
 }
 
 void loop()
@@ -82,14 +91,18 @@ void loop()
     uint32_t seconds_to_wait = file_start_modulo_seconds - (current_posix % file_start_modulo_seconds);
     sleep_for_seconds(seconds_to_wait);
 
-    // TODO: continue here
     if (use_usb){
         SERIAL_USB->println(F("start new measurement cycle"));
     }
-    delay(5000);  // dummy delay just for now
+    wdt.restart();
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get start of file lat, lon, time
+    // TODO: BONUS: if too many failures, either reboot or just go further
+    while (gnss_simple_manager_instance.get_good_averaged_fix(current_fix_start) != 0){
+        delay(1000);
+        wdt.restart();
+    }
 
     ////////////////////////////////////////////////////////////////////////////////
     // we need to take Kalman filter etc; boost
@@ -98,22 +111,23 @@ void loop()
     ////////////////////////////////////////////////////////////////////////////////
     // log data for the duration of the file
 
+    delay(5000);  // dummy delay just for now
+    wdt.restart();
+
     ////////////////////////////////////////////////////////////////////////////////
     // done need to take Kalman filter etc; deboost
     disableBurstMode();
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get end of file lat, lon, time
+    // TODO: BONUS: if too many failures, either reboot or just go further
+    while (gnss_simple_manager_instance.get_good_averaged_fix(current_fix_end) != 0){
+        delay(1000);
+    }
 
     ////////////////////////////////////////////////////////////////////////////////
     // sd card dumping
+    sd_manager_instance.update_filename(current_fix_start);
+    sd_manager_instance.log_data();
 
-    // generate file name: from datetime of start of the time series
-    // YYYY-MM-DD-HH-MM.dat
-
-    // open the new file
-
-    // write to the file
-
-    // close the file
 }
