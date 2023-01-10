@@ -3,6 +3,8 @@
 
 #include "Arduino.h"
 
+// adding the following allows to compile
+// #include "SdFat.h"
 #include "firmware_configuration.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////
