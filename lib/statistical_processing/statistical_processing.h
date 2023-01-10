@@ -8,6 +8,9 @@
 
 #include "math.h"
 
+#include "user_configuration.h"
+#include "firmware_configuration.h"
+
 #ifndef STAT_PROCESSING_VERBOSE
   #define STAT_PROCESSING_VERBOSE 0
 #endif
@@ -30,14 +33,18 @@ T accurate_sigma_filter(etl::ivector<T> const & vec_in, double n_sigma=2.0, bool
   if (n_sigma < 1.5){
     n_sigma = 1.5;
     #if STAT_PROCESSING_VERBOSE
-      Serial.println(F("we were using unsafe small n_sigma; set it to 1.5"));
+    if (use_usb){
+      SERIAL_USB->println(F("we were using unsafe small n_sigma; set it to 1.5"));
+    }
     #endif
   }
 
   // do we have a vec of length 0? if this is the case, return default value 0
   if (vec_in.size() == 0){
     #if STAT_PROCESSING_VERBOSE
-      Serial.println(F("empty vector, return 0"));
+    if (use_usb){
+      SERIAL_USB->println(F("empty vector, return 0"));
+    }
     #endif
     return 0;
   }
@@ -55,7 +62,9 @@ T accurate_sigma_filter(etl::ivector<T> const & vec_in, double n_sigma=2.0, bool
   // all elements are equal, just return the first element
   if (all_equal){
     #if STAT_PROCESSING_VERBOSE
-      Serial.println(F("all elements equal, use the first element"));
+    if (use_usb){
+      SERIAL_USB->println(F("all elements equal, use the first element"));
+    }
     #endif
     return first_elem;
   }
@@ -75,7 +84,9 @@ T accurate_sigma_filter(etl::ivector<T> const & vec_in, double n_sigma=2.0, bool
   }
 
   #if STAT_PROCESSING_VERBOSE
-    Serial.print(F("double_mean = ")); Serial.println(double_mean);
+  if (use_usb){
+    SERIAL_USB->print(F("double_mean = ")); SERIAL_USB->println(double_mean);
+  }
   #endif
 
   // calculate the double rms
@@ -86,7 +97,9 @@ T accurate_sigma_filter(etl::ivector<T> const & vec_in, double n_sigma=2.0, bool
   }
 
   #if STAT_PROCESSING_VERBOSE
-    Serial.print(F("double_rms = ")); Serial.println(double_rms);
+  if (use_usb){
+    SERIAL_USB->print(F("double_rms = ")); SERIAL_USB->println(double_rms);
+  }
   #endif
 
   // calculate the double std
@@ -97,8 +110,10 @@ T accurate_sigma_filter(etl::ivector<T> const & vec_in, double n_sigma=2.0, bool
   double double_max_distance = n_sigma * double_std; 
 
   #if STAT_PROCESSING_VERBOSE
-    Serial.print(F("double_std = ")); Serial.println(double_std);
-    Serial.print(F("double_max_distance = ")); Serial.println(double_max_distance);
+  if (use_usb){
+    SERIAL_USB->print(F("double_std = ")); SERIAL_USB->println(double_std);
+    SERIAL_USB->print(F("double_max_distance = ")); SERIAL_USB->println(double_max_distance);
+  }
   #endif
 
   // find out the coarse mean with only the points that should be used for calculating
@@ -119,8 +134,10 @@ T accurate_sigma_filter(etl::ivector<T> const & vec_in, double n_sigma=2.0, bool
   T coarse_mean = static_cast<T>(double_coarse_mean);
 
   #if STAT_PROCESSING_VERBOSE
-    Serial.print(F("nbr_of_valid_points ")); Serial.println(nbr_of_valid_points);
-    Serial.print(F("coarse_mean = ")); Serial.println(coarse_mean);
+  if (use_usb){
+    SERIAL_USB->print(F("nbr_of_valid_points ")); SERIAL_USB->println(nbr_of_valid_points);
+    SERIAL_USB->print(F("coarse_mean = ")); SERIAL_USB->println(coarse_mean);
+  }
   #endif
 
   // find out the fine mean (relative to the coarse mean)
@@ -136,7 +153,9 @@ T accurate_sigma_filter(etl::ivector<T> const & vec_in, double n_sigma=2.0, bool
   fine_mean /= static_cast<T>(nbr_of_valid_points);
 
   #if STAT_PROCESSING_VERBOSE
-    Serial.print(F("fine_mean = ")); Serial.println(fine_mean);
+  if (use_usb){
+    SERIAL_USB->print(F("fine_mean = ")); SERIAL_USB->println(fine_mean);
+  }
   #endif
 
   return (coarse_mean + fine_mean);

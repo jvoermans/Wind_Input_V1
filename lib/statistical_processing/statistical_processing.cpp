@@ -12,7 +12,9 @@ float float_mean_filter(etl::ivector<float> const & vec_in){
 float float_sigma_filter(etl::ivector<float> const & vec_in, float n_sigma){
   // if empty vector print error message and return 0
   if (vec_in.size() == 0){
-    Serial.println(F("WARNING!!! take sigma filter of empty vec"));
+    if (use_usb){
+      SERIAL_USB->println(F("WARNING!!! take sigma filter of empty vec"));
+    }
     return 0.0f;
   }
 
@@ -26,7 +28,9 @@ float float_sigma_filter(etl::ivector<float> const & vec_in, float n_sigma){
     }
   }
   if (all_equal){
-    Serial.println(F("WARNING!!! take sigma filter of all equal vec"));
+    if (use_usb){
+      SERIAL_USB->println(F("WARNING!!! take sigma filter of all equal vec"));
+    }
     return (vec_in[0]);
   }
 
@@ -57,18 +61,22 @@ float float_sigma_filter(etl::ivector<float> const & vec_in, float n_sigma){
       nbr_of_ok_values++;
     }
     else{
-      Serial.print(F("outlier ")); Serial.print(vec_in[ind]);
-      print_vector = true;
+      if (use_usb){
+        SERIAL_USB->print(F("outlier ")); SERIAL_USB->print(vec_in[ind]);
+        print_vector = true;
+      }
     }
   }
   sigma_average /= nbr_of_ok_values;
 
-  if (print_vector){
-    Serial.print(F(" from "));
-    for (int ind=0; ind<vec_in.size(); ind++){
-      Serial.print(vec_in[ind]); Serial.print(" ");
+  if (use_usb){
+    if (print_vector){
+      SERIAL_USB->print(F(" from "));
+      for (int ind=0; ind<vec_in.size(); ind++){
+        SERIAL_USB->print(vec_in[ind]); SERIAL_USB->print(" ");
+      }
+      SERIAL_USB->println();
     }
-    Serial.println();
   }
 
   return sigma_average;

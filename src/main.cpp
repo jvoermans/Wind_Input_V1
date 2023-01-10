@@ -69,7 +69,8 @@ void setup()
 
     ////////////////////////////////////////////////////////////////////////////////
     // set the time manager
-    while(gnss_simple_manager_instance.get_good_single_fix_and_set_rtc(current_working_GNSS_simple_fix) != 0){delay(100);};
+    // TODO: if too many failures, either reboot or just go further
+    while(gnss_simple_manager_instance.get_good_single_fix_and_set_rtc(current_working_GNSS_simple_fix) != 0){delay(1000);};
 }
 
 void loop()
@@ -82,6 +83,9 @@ void loop()
     sleep_for_seconds(seconds_to_wait);
 
     // TODO: continue here
+    if (use_usb){
+        SERIAL_USB->println(F("start new measurement cycle"));
+    }
     delay(5000);  // dummy delay just for now
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -89,12 +93,14 @@ void loop()
 
     ////////////////////////////////////////////////////////////////////////////////
     // we need to take Kalman filter etc; boost
+    enableBurstMode();
 
     ////////////////////////////////////////////////////////////////////////////////
     // log data for the duration of the file
 
     ////////////////////////////////////////////////////////////////////////////////
     // done need to take Kalman filter etc; deboost
+    disableBurstMode();
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get end of file lat, lon, time
