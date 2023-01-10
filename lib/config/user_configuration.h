@@ -40,7 +40,15 @@ static_assert(std::is_same<uint32_t,unsigned long>::value);
 // ie to start every 10 minutes: 10 * 60
 static constexpr uint32_t file_start_modulo_seconds {10 * 60};
 
-// static constexpr 
+// how long duration we actually log
+
+// assert shorter than file modulo
+
+// how many samples this corresponds to
+
+// assert this uses less than 75% RAM
+
+// 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // sleep
