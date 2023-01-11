@@ -38,34 +38,26 @@ uint8_t GNSS_simple_manager::initialize(void)
 {
     dummy_initialize_fix(current_working_GNSS_simple_fix);
 
-    if (started)
+    bool success = adafruit_gps_instance.begin(9600);
+    if (!success)
     {
-        return 0;
-    }
-
-    else
-    {
-        bool success = adafruit_gps_instance.begin(9600);
-        if (!success)
+        if (use_usb)
         {
-            if (use_usb)
-            {
-                SERIAL_USB->println(F("ERR: cannot .begin GNSS"));
-            }
-            return 1;
+            SERIAL_USB->println(F("ERR: cannot .begin GNSS"));
         }
-
-        adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
-        adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
-
-        started = true;
-
-        adafruit_gps_instance.standby();
-
-        wdt.restart();
-
-        return 0;
+        return 1;
     }
+
+    adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
+    adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+    delay(100);
+    wdt.restart();
+
+    adafruit_gps_instance.standby();
+    delay(100);
+    wdt.restart();
+
+    return 0;
 }
 
 uint8_t GNSS_simple_manager::turn_on(void)
@@ -82,7 +74,15 @@ uint8_t GNSS_simple_manager::turn_on(void)
 
     else
     {
+        delay(100);
+        wdt.restart();
         bool_status = adafruit_gps_instance.wakeup();
+        delay(100);
+        wdt.restart();
+        adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
+        adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+        delay(100);
+        wdt.restart();
 
         if (!bool_status){
             if (use_usb){
@@ -98,7 +98,11 @@ uint8_t GNSS_simple_manager::turn_on(void)
 
 uint8_t GNSS_simple_manager::turn_off(void){
     adafruit_gps_instance.standby();
+    delay(100);
+    wdt.restart();
     GNSS_UART->end();
+    delay(100);
+    wdt.restart();
 
     return 0;
 }

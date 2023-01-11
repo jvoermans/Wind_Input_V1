@@ -81,9 +81,6 @@ class GNSS_simple_manager{
         // this assumes that the GNSS is already turned on, and does not turn off the GNSS once a fix is gotten
         uint8_t get_single_fix(uint32_t timeout_milliseconds, GNSS_simple_fix & output_fix);
 
-        // is it started, like, has it been initialized including the UART, settings etc?
-        bool started {false};
-
         etl::vector<int32_t, gnss_number_fixes_to_compute_good> accumulator_latitude;
         etl::vector<int32_t, gnss_number_fixes_to_compute_good> accumulator_longitude;
         etl::vector<int32_t, gnss_number_fixes_to_compute_good> accumulator_posix;
