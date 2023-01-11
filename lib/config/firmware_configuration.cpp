@@ -13,7 +13,7 @@ Uart * GNSS_UART {&Serial1};
 // functions
 
 void print_firmware_config(void){
-    SERIAL_USB->println(F("OpenMetBuoy-v2021 | https://github.com/jerabaul29/OpenMetBuoy-v2021a"));
+    SERIAL_USB->println(F("WindInput logger | https://github.com/jvoermans/Wind_Input_V1"));
     SERIAL_USB->print(F("Compiled: "));
     SERIAL_USB->print(F(__DATE__));
     SERIAL_USB->print(F(", "));
