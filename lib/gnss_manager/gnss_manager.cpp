@@ -38,6 +38,10 @@ uint8_t GNSS_simple_manager::initialize(void)
 {
     dummy_initialize_fix(current_working_GNSS_simple_fix);
 
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("begin initialize gnss"));
+    }
+
     bool success = adafruit_gps_instance.begin(9600);
     if (!success)
     {
@@ -48,14 +52,42 @@ uint8_t GNSS_simple_manager::initialize(void)
         return 1;
     }
 
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("send gnss commands rates"));
+    }
+
+    delay(1000);
+    wdt.restart();
+
     adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
+    delay(100);
+    //adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
     adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
     delay(100);
+    delay(1000);
     wdt.restart();
+
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("ask gnss antenna status"));
+    }
+
+    adafruit_gps_instance.sendCommand(PGCMD_ANTENNA);
+    delay(100);
+    while (GNSS_UART->available() > 0){
+        SERIAL_USB->print((char) GNSS_UART->read());
+    }
+
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("send gnss standby order"));
+    }
 
     adafruit_gps_instance.standby();
     delay(100);
     wdt.restart();
+
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("done initialize gnss"));
+    }
 
     return 0;
 }
@@ -66,6 +98,17 @@ uint8_t GNSS_simple_manager::turn_on(void)
     bool bool_status;
 
     status = initialize();
+
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("awake gnss"));
+    }
+
+        while(true){
+            if (GNSS_UART->available() > 0){
+                SERIAL_USB->print((char) GNSS_UART->read());
+            }
+        }
+
 
     if (status != 0)
     {
@@ -119,6 +162,10 @@ uint8_t GNSS_simple_manager::get_single_fix(uint32_t timeout_milliseconds, GNSS_
 
         // read chars as they arrive
         char c = adafruit_gps_instance.read();
+
+        if (use_usb && use_usb_gnss_debug){
+            SERIAL_USB->print(c);
+        }
 
         // at this stage we have received a full NMEA sentence, look at it
         if (adafruit_gps_instance.newNMEAreceived()) {

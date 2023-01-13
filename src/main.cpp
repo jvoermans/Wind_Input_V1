@@ -50,6 +50,7 @@ void setup()
         wdt.restart();
     }
 
+
     ////////////////////////////////////////////////////////////////////////////////
     // TODO: CRITICAL: start / check the different sensors and the SD card to check that all looks good
 
@@ -97,6 +98,8 @@ void setup()
     if (use_usb){
         SERIAL_USB->println(F("done setup"));
     }
+
+    accX.push_back(0);
 }
 
 void loop()
@@ -148,8 +151,7 @@ void loop()
         SERIAL_USB->println(F("log data"));
     }
 
-    delay(5000);  // dummy delay just for now
-    wdt.restart();
+    // data_manager_instance.gather_dataset();
 
     ////////////////////////////////////////////////////////////////////////////////
     // done need to take Kalman filter etc; deboost
