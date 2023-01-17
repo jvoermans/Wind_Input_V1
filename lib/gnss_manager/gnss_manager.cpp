@@ -34,14 +34,23 @@ void copy_fix(GNSS_simple_fix const & in, GNSS_simple_fix & out){
     out.posix_timestamp = in.posix_timestamp;
 }
 
-uint8_t GNSS_simple_manager::initialize(void)
+uint8_t GNSS_simple_manager::turn_on(void)
 {
-    dummy_initialize_fix(current_working_GNSS_simple_fix);
-
     if (use_usb && use_usb_gnss_debug){
-        SERIAL_USB->println(F("begin initialize gnss"));
+        SERIAL_USB->println(F("gnss turn on"));
     }
 
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss enable high"));
+    }
+    pinMode(GNSS_EN_PIN, OUTPUT);
+    digitalWrite(GNSS_EN_PIN, HIGH);
+    delay(100);
+    wdt.restart();
+
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss start serial"));
+    }
     bool success = adafruit_gps_instance.begin(9600);
     if (!success)
     {
@@ -51,101 +60,48 @@ uint8_t GNSS_simple_manager::initialize(void)
         }
         return 1;
     }
-
-    if (use_usb && use_usb_gnss_debug){
-        SERIAL_USB->println(F("send gnss commands rates"));
-    }
-
-    delay(1000);
+    delay(100);
     wdt.restart();
 
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss send commands"));
+    }
     adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
     delay(100);
     //adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
     adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
     delay(100);
-    delay(1000);
     wdt.restart();
 
     if (use_usb && use_usb_gnss_debug){
-        SERIAL_USB->println(F("ask gnss antenna status"));
-    }
-
-    adafruit_gps_instance.sendCommand(PGCMD_ANTENNA);
-    delay(100);
-    while (GNSS_UART->available() > 0){
-        SERIAL_USB->print((char) GNSS_UART->read());
-    }
-
-    if (use_usb && use_usb_gnss_debug){
-        SERIAL_USB->println(F("send gnss standby order"));
-    }
-
-    adafruit_gps_instance.standby();
-    delay(100);
-    wdt.restart();
-
-    if (use_usb && use_usb_gnss_debug){
-        SERIAL_USB->println(F("done initialize gnss"));
+        SERIAL_USB->println(F("gnss done turn on"));
     }
 
     return 0;
 }
 
-uint8_t GNSS_simple_manager::turn_on(void)
-{
-    uint8_t status;
-    bool bool_status;
-
-    status = initialize();
+uint8_t GNSS_simple_manager::turn_off(void){
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss turn off"));
+    }
 
     if (use_usb && use_usb_gnss_debug){
-        SERIAL_USB->println(F("awake gnss"));
+        SERIAL_USB->println(F("gnss end uart"));
     }
-
-        while(true){
-            if (GNSS_UART->available() > 0){
-                SERIAL_USB->print((char) GNSS_UART->read());
-            }
-        }
-
-
-    if (status != 0)
-    {
-        return status;
-    }
-
-    else
-    {
-        delay(100);
-        wdt.restart();
-        bool_status = adafruit_gps_instance.wakeup();
-        delay(100);
-        wdt.restart();
-        adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
-        adafruit_gps_instance.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
-        delay(100);
-        wdt.restart();
-
-        if (!bool_status){
-            if (use_usb){
-                SERIAL_USB->println(F("ERR: cannot .wakeup GNSS"));
-            }
-
-            return 2;
-        }
-
-        return 0;
-    }
-}
-
-uint8_t GNSS_simple_manager::turn_off(void){
-    adafruit_gps_instance.standby();
-    delay(100);
-    wdt.restart();
     GNSS_UART->end();
     delay(100);
     wdt.restart();
+
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss enable low"));
+    }
+    digitalWrite(GNSS_EN_PIN, LOW);
+    delay(100);
+    wdt.restart();
+
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss done turn off"));
+    }
 
     return 0;
 }
@@ -155,6 +111,10 @@ uint8_t GNSS_simple_manager::get_single_fix(uint32_t timeout_milliseconds, GNSS_
 
     uint32_t start = millis();
     char c;
+
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss start grab uart output"));
+    }
 
     // read from the GPS until we time out
     while (millis() - start < timeout_milliseconds){
@@ -170,11 +130,35 @@ uint8_t GNSS_simple_manager::get_single_fix(uint32_t timeout_milliseconds, GNSS_
         // at this stage we have received a full NMEA sentence, look at it
         if (adafruit_gps_instance.newNMEAreceived()) {
 
+            if (use_usb && use_usb_gnss_debug){
+                SERIAL_USB->println(F("gnss received NMEA end"));
+            }
+
             // are we able to parse it? if not, continue reading
             if (!adafruit_gps_instance.parse(adafruit_gps_instance.lastNMEA())){
                 continue;
             }
 
+            if (use_usb && use_usb_gnss_debug){
+                SERIAL_USB->println(F("gnss NMEA parsed valid"));
+            }
+
+            // is this well a RMC sentence?
+            if (!strcmp(adafruit_gps_instance.lastSentence, "RMC")){
+                if (use_usb && use_usb_gnss_debug){
+                    SERIAL_USB->println(F("gnss NMEA is RMC"));
+                }
+            }
+            else {
+                if (use_usb && use_usb_gnss_debug){
+                    SERIAL_USB->println(F("gnss NMEA is not RMC"));
+                }
+                continue;
+            }
+
+            if (use_usb && use_usb_gnss_debug){
+                SERIAL_USB->println(F("gnss fill output fix"));
+            }
             // is this actually a valid fix? if yes, return
             if (adafruit_gps_instance.fix && (adafruit_gps_instance.fixquality > 0)){
 
@@ -208,19 +192,15 @@ uint8_t GNSS_simple_manager::get_single_fix(uint32_t timeout_milliseconds, GNSS_
 uint8_t GNSS_simple_manager::get_good_averaged_fix(GNSS_simple_fix & output_fix){
     uint8_t status;
 
-    // turn on
-    for (size_t attempt = 0; attempt < gnss_max_nbr_turn_on_attempts; attempt++)
-    {
-        status = turn_on();
-
-        if (status == 0)
-        {
-            break;
-        }
-
-        delay(100);
-        wdt.restart();
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss get good averaged fix"));
     }
+
+    status = turn_on();
+    delay(100);
+    wdt.restart();
+    
+    dummy_initialize_fix(output_fix);
 
     if (status != 0){
         output_fix.validity_status = status;
@@ -228,6 +208,9 @@ uint8_t GNSS_simple_manager::get_good_averaged_fix(GNSS_simple_fix & output_fix)
     }
 
     // get the first fix with the first fix timeout
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss get first fix"));
+    }
     status = get_single_fix(gnss_fix_timeout_first_fix_milliseconds, current_working_GNSS_simple_fix);
 
     if (status != 0){
@@ -236,6 +219,9 @@ uint8_t GNSS_simple_manager::get_good_averaged_fix(GNSS_simple_fix & output_fix)
 
     // get and discard a few more fixes within the update timeout for each of them, to make sure that
     // get time to converge to a good fix
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss get discard fixes"));
+    }
     for (size_t discard = 0; discard < 10; discard++){
         status = get_single_fix(gnss_fix_timeout_subsequent_fix_milliseconds, current_working_GNSS_simple_fix);
         if (status != 0){
@@ -244,6 +230,9 @@ uint8_t GNSS_simple_manager::get_good_averaged_fix(GNSS_simple_fix & output_fix)
     }
 
     // get a few fixes and sigma-sample within the update timeout for each of them
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss get nsigma fixes"));
+    }
     for (size_t fix_number = 0; fix_number < gnss_number_fixes_to_compute_good; fix_number++){
         status = get_single_fix(gnss_fix_timeout_subsequent_fix_milliseconds, current_working_GNSS_simple_fix);
         if (status != 0){
@@ -255,6 +244,9 @@ uint8_t GNSS_simple_manager::get_good_averaged_fix(GNSS_simple_fix & output_fix)
         accumulator_posix.push_back(current_working_GNSS_simple_fix.posix_timestamp);
     }
 
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss compute nsigma fix"));
+    }
     // we use the latest fit information for everything, except the lat and lon and posix and year month day hour minute: compute n-sigma and update each of these
     copy_fix(current_working_GNSS_simple_fix, output_fix);
 
@@ -271,7 +263,7 @@ uint8_t GNSS_simple_manager::get_good_averaged_fix(GNSS_simple_fix & output_fix)
     output_fix.minute = calendar_time_out.minute;
 
     if (use_usb){
-        SERIAL_USB->println(F("--- good average fix start"));
+        SERIAL_USB->println(F("--- gnss good average fix start"));
         PRINTLN_VAR(output_fix.posix_timestamp);
         PRINTLN_VAR(output_fix.year);
         PRINTLN_VAR(output_fix.month);
@@ -282,84 +274,24 @@ uint8_t GNSS_simple_manager::get_good_averaged_fix(GNSS_simple_fix & output_fix)
         PRINTLN_VAR(output_fix.lat_NS);
         PRINTLN_VAR(output_fix.longitude);
         PRINTLN_VAR(output_fix.lon_EW);
-        SERIAL_USB->println(F("--- good average fix end"));
+        SERIAL_USB->println(F("--- gnss good average fix end"));
     }
 
     wdt.restart();
 
+    // we set the RTC with the nsigma fix; this may introduce some jitter, but anyways we will not use this
+    // to compare between instruments, so we do not care about an accuracy of +- a few seconds or tens of seconds
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss set RTC"));
+    }
+    board_time_manager.set_posix_timestamp(output_fix.posix_timestamp);
+
     // turn off
     status = turn_off();
 
-    return status;
-}
-
-uint8_t GNSS_simple_manager::get_good_single_fix_and_set_rtc(GNSS_simple_fix & output_fix){
-    uint8_t status;
-
-    // turn on
-    for (size_t attempt = 0; attempt < gnss_max_nbr_turn_on_attempts; attempt++)
-    {
-        status = turn_on();
-
-        if (status == 0)
-        {
-            break;
-        }
-
-        delay(100);
-        wdt.restart();
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss done average fix"));
     }
-
-    if (status != 0){
-        output_fix.validity_status = status;
-        return status;
-    }
-
-    // get the first fix with the first fix timeout
-    status = get_single_fix(gnss_fix_timeout_first_fix_milliseconds, current_working_GNSS_simple_fix);
-
-    if (status != 0){
-        return status;
-    }
-
-    // get and discard a few more fixes within the update timeout for each of them, to make sure that
-    // get time to converge to a good fix
-    for (size_t discard = 0; discard < 10; discard++){
-        status = get_single_fix(gnss_fix_timeout_subsequent_fix_milliseconds, current_working_GNSS_simple_fix);
-        if (status != 0){
-            return status;
-        }
-    }
-
-    // get the actual fix to use
-    status = get_single_fix(gnss_fix_timeout_subsequent_fix_milliseconds, current_working_GNSS_simple_fix);
-    if (status != 0){
-        return status;
-    }
-
-    board_time_manager.set_posix_timestamp(current_working_GNSS_simple_fix.posix_timestamp);
-
-    copy_fix(current_working_GNSS_simple_fix, output_fix);
-
-    if (use_usb){
-        SERIAL_USB->println(F("--- good average fix start"));
-        PRINTLN_VAR(output_fix.posix_timestamp);
-        PRINTLN_VAR(output_fix.year);
-        PRINTLN_VAR(output_fix.month);
-        PRINTLN_VAR(output_fix.day);
-        PRINTLN_VAR(output_fix.hour);
-        PRINTLN_VAR(output_fix.minute);
-        PRINTLN_VAR(output_fix.latitude);
-        PRINTLN_VAR(output_fix.lat_NS);
-        PRINTLN_VAR(output_fix.longitude);
-        PRINTLN_VAR(output_fix.lon_EW);
-        SERIAL_USB->println(F("--- good average fix end"));
-    }
-
-    wdt.restart();
-
-    // turn off
-    status = turn_off();
 
     return status;
 }

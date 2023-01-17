@@ -59,21 +59,13 @@ class GNSS_simple_manager{
     public:
         // get a good averaged fix; note that this may require taking several "raw" fixes to ensure quality
         // this automatically starts the GNSS, takes as many raw fixes as needed to get a good average fix, and stops the GNSS (to save power)
+        // this also sets the RTC clock using the last fix
         uint8_t get_good_averaged_fix(GNSS_simple_fix & output_fix);
-
-        // get a good single fix; note that this may take a bit of time, as one may need to wait a bit for getting an actual fix
-        // this automatically starts the GNSS, takes as many raw fixes as needed to get a good single fix, and stops the GNSS (to save power)
-        // in addition, use this good single fix to set the RTC
-        uint8_t get_good_single_fix_and_set_rtc(GNSS_simple_fix & output_fix);
 
     private:  
         // uint8_t used as indications of internal issue; 0 is all is well, other is some issue
 
-        // initialize the gnss: start the uart, the gnss class, set up rates etc, and put in standby mode to save power
-        uint8_t initialize(void);
-
-        // turn on and off; in our case, since there is no mosfet to really turn power on off, this is rather standby vs wakeup
-        // but if adding a mosfet, that may become a full shutdown
+        // turn on and off
         uint8_t turn_on(void);
         uint8_t turn_off(void);
 

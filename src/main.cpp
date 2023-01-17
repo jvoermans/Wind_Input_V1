@@ -50,7 +50,6 @@ void setup()
         wdt.restart();
     }
 
-
     ////////////////////////////////////////////////////////////////////////////////
     // TODO: CRITICAL: start / check the different sensors and the SD card to check that all looks good
 
@@ -59,8 +58,9 @@ void setup()
     // if not GNSS fix, simply go to sleep for 15 minutes before re-trying
     // (note: the GNSS cannot be fully turned out, only put to standby, so not sure
     // how power efficient the sleep actually is, but cannot hurt to sleep)
+    // note that this also sets the RTC clock
     if (use_usb){
-        SERIAL_USB->println(F("init GPS, get first fix"));
+        SERIAL_USB->println(F("init GPS, get first fix, set RTC clock"));
     }
 
     status = 255;
@@ -76,14 +76,6 @@ void setup()
         // else sleep a bit and try again later
         sleep_for_seconds(15*60);
     }
-
-    ////////////////////////////////////////////////////////////////////////////////
-    // set the time manager
-    if (use_usb){
-        SERIAL_USB->println(F("init time manager, set time"));
-    }
-    // TODO: BONUS: if too many failures, either reboot or just go further
-    while(gnss_simple_manager_instance.get_good_single_fix_and_set_rtc(current_fix_start) != 0){delay(1000);};
 
     ////////////////////////////////////////////////////////////////////////////////
     // log a boot message
