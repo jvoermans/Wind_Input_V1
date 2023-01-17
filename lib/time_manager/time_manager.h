@@ -37,11 +37,11 @@ class TimeManager{
     // will display posix and calendar time, as well as status
     void print_status(void) const;
 
-  private:
     // set the low level RTC properties through the HAL to allow it to count
     // seconds in an interrupt-driven way
     void setup_RTC(void);
 
+  private:
     // have we ever set a posix timestamp?
     bool posix_is_set;
 };

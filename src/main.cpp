@@ -38,6 +38,10 @@ void setup()
     // from now on, need to wdt.restart(); at least every 32 seconds, else reboot
 
     ////////////////////////////////////////////////////////////////////////////////
+    // setup RTC
+    board_time_manager.setup_RTC();
+
+    ////////////////////////////////////////////////////////////////////////////////
     // start USB and standard prints, if relevant
     if (use_usb){
         SERIAL_USB->begin(BAUD_RATE_USB);
@@ -60,7 +64,7 @@ void setup()
     // how power efficient the sleep actually is, but cannot hurt to sleep)
     // note that this also sets the RTC clock
     if (use_usb){
-        SERIAL_USB->println(F("init GPS, get first fix, set RTC clock"));
+        SERIAL_USB->println(F("setup init GPS, get first fix, set RTC clock"));
     }
 
     status = 255;
@@ -80,7 +84,7 @@ void setup()
     ////////////////////////////////////////////////////////////////////////////////
     // log a boot message
     if (use_usb){
-        SERIAL_USB->println(F("write boot message"));
+        SERIAL_USB->println(F("setup write boot message"));
     }
     sd_manager_instance.update_filename(current_fix_start);
     sd_manager_instance.log_boot();
@@ -88,10 +92,8 @@ void setup()
     ////////////////////////////////////////////////////////////////////////////////
     // done setup
     if (use_usb){
-        SERIAL_USB->println(F("done setup"));
+        SERIAL_USB->println(F("setup done"));
     }
-
-    accX.push_back(0);
 }
 
 void loop()
@@ -99,7 +101,7 @@ void loop()
     ////////////////////////////////////////////////////////////////////////////////
     // done setup
     if (use_usb){
-        SERIAL_USB->println(F("start loop"));
+        SERIAL_USB->println(F("loop start"));
     }
 
     ////////////////////////////////////////////////////////////////////////////////

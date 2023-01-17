@@ -100,9 +100,20 @@ void SD_Manager::log_boot(void){
     delay(100);
     wdt.restart();
 
-    sd_file.write("\nBOOT\nGNSS dump\n");
+    sd_file.print(F("\nBOOT\nGNSS binary dump\n"));
     sd_file.write((void *)(&current_fix_start), sizeof(GNSS_simple_fix));
-    sd_file.write("\ndone\n");
+    sd_file.print(F("\ndone\n"));
+    sd_file.print(F("as string\n"));
+    sd_file.println(current_fix_start.year);
+    sd_file.println(current_fix_start.month);
+    sd_file.println(current_fix_start.day);
+    sd_file.println(current_fix_start.hour);
+    sd_file.println(current_fix_start.minute);
+    sd_file.println(current_fix_start.latitude);
+    sd_file.println(current_fix_start.lat_NS);
+    sd_file.println(current_fix_start.longitude);
+    sd_file.println(current_fix_start.lon_EW);
+    sd_file.write("done\n");
     delay(100);
     wdt.restart();
 
