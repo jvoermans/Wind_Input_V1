@@ -2,4 +2,6 @@
 
 Logger logger_instance;
 
-Logger::start_ism330dhcx;
+uint8_t Logger::start_ism330dhcx(void){
+    
+}
