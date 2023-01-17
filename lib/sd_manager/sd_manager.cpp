@@ -100,10 +100,10 @@ void SD_Manager::log_boot(void){
     delay(100);
     wdt.restart();
 
-    sd_file.print(F("\nBOOT\nGNSS binary dump\n"));
+    sd_file.print(F("\n\nBOOT\n\n\n\nGNSS_binary\n\n"));
     sd_file.write((void *)(&current_fix_start), sizeof(GNSS_simple_fix));
-    sd_file.print(F("\ndone\n"));
-    sd_file.print(F("as string\n"));
+    sd_file.print(F("\n\nGNSS_binary_done\n\n\n\n"));
+    sd_file.print(F("GNSS_string\n\n"));
     sd_file.println(current_fix_start.year);
     sd_file.println(current_fix_start.month);
     sd_file.println(current_fix_start.day);
@@ -112,10 +112,11 @@ void SD_Manager::log_boot(void){
     sd_file.println(current_fix_start.latitude);
     sd_file.println(current_fix_start.lat_NS);
     sd_file.println(current_fix_start.longitude);
-    sd_file.println(current_fix_start.lon_EW);
-    sd_file.write("done\n");
+    sd_file.print(current_fix_start.lon_EW);
+    sd_file.write("\n\nGNSS_string_done\n\n\n\n");
     delay(100);
     wdt.restart();
+    sd_file.print(F("BOOT_done\n\n"));
 
     stop();
     delay(100);
@@ -127,16 +128,62 @@ void SD_Manager::log_data(void){
     delay(100);
     wdt.restart();
 
-    sd_file.write("\nDATA\nGNSS start\n");
+    sd_file.print(F("\n\nDATA\n\n\n\nGNSS_start\n\n"));
     wdt.restart();
     sd_file.write((void *)(&current_fix_start), sizeof(GNSS_simple_fix));
     wdt.restart();
-    sd_file.write("\ndone\nGNSS end\n");
+    sd_file.print(F("\n\nGNSS_start_done\n\n\n\nGNSS_end\n\n"));
     wdt.restart();
     sd_file.write((void *)(&current_fix_start), sizeof(GNSS_simple_fix));
     wdt.restart();
-    sd_file.write("\ndone\n");
+    sd_file.print(F("\n\nGNSS_end_done\n\n\n\n"));
     wdt.restart();
+    delay(100);
+    wdt.restart();
+
+    sd_file.print(F("accX_array\n\n"));
+    wdt.restart();
+    sd_file.write((void *)(&accX), sizeof(accX));
+    wdt.restart();
+    sd_file.print(F("\n\naccX_array_done\n\n\n\n"));
+    wdt.restart();
+
+    sd_file.print(F("accY_array\n\n"));
+    wdt.restart();
+    sd_file.write((void *)(&accY), sizeof(accY));
+    wdt.restart();
+    sd_file.print(F("\n\naccY_array_done\n\n\n\n"));
+    wdt.restart();
+
+    sd_file.print(F("accZ_array\n\n"));
+    wdt.restart();
+    sd_file.write((void *)(&accZ), sizeof(accZ));
+    wdt.restart();
+    sd_file.print(F("\n\naccZ_array_done\n\n\n\n"));
+    wdt.restart();
+
+    sd_file.print(F("accN_array\n\n"));
+    wdt.restart();
+    sd_file.write((void *)(&accN), sizeof(accN));
+    wdt.restart();
+    sd_file.print(F("\n\naccN_array_done\n\n\n\n"));
+    wdt.restart();
+
+    sd_file.print(F("press1_array\n\n"));
+    wdt.restart();
+    sd_file.write((void *)(&press1), sizeof(press1));
+    wdt.restart();
+    sd_file.print(F("\n\npress1_array_done\n\n\n\n"));
+    wdt.restart();
+
+    sd_file.print(F("press2_array\n\n"));
+    wdt.restart();
+    sd_file.write((void *)(&press2), sizeof(press2));
+    wdt.restart();
+    sd_file.print(F("\n\npress2_array_done\n\n\n\n"));
+    wdt.restart();
+
+    sd_file.print(F("DATA-done\n\n"));
 
     stop();
     delay(100);
