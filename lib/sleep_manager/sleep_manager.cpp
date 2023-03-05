@@ -13,10 +13,14 @@ void user_sleep_post_actions(void) __attribute__((weak));
 void user_sleep_pre_actions(void)
 {
 
+  gnss_simple_manager_instance.turn_on_off();
+  delay(500);
+  wdt.restart();
+
   if (use_usb){
     SERIAL_USB->end();
   }
-
+  
 }
 void user_sleep_post_actions(void)
 {

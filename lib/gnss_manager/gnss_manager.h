@@ -57,6 +57,9 @@ void copy_fix(GNSS_simple_fix const & in, GNSS_simple_fix & out);
 
 class GNSS_simple_manager{
     public:
+        // turn on and off, to make sure it is off from the start
+        void turn_on_off(void);
+
         // get a good averaged fix; note that this may require taking several "raw" fixes to ensure quality
         // this automatically starts the GNSS, takes as many raw fixes as needed to get a good average fix, and stops the GNSS (to save power)
         // this also sets the RTC clock using the last fix

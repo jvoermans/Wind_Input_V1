@@ -8,6 +8,9 @@
 #include "user_configuration.h"
 #include "watchdog_manager.h"
 
+// for some reason, need to turn the GNSS on off before sleep, otherwise gets woken up all the time by the serial coming in
+#include "gnss_manager.h"
+
 
 // NOTE: could put in an own namespace, but a bit heavier to use
 

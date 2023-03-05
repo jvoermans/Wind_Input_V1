@@ -25,7 +25,7 @@ void setup()
 {
     ////////////////////////////////////////////////////////////////////////////////
     // startup delay, to avoid super fast restarts etc
-    delay(1000);
+    delay(10000);
 
     ////////////////////////////////////////////////////////////////////////////////
     // setup watchdog
@@ -53,6 +53,9 @@ void setup()
         print_all_user_configs();
         wdt.restart();
     }
+
+    gnss_simple_manager_instance.turn_on_off();
+    sleep_for_seconds(11);
 
     ////////////////////////////////////////////////////////////////////////////////
     // TODO: CRITICAL: start / check the different sensors and the SD card to check that all looks good

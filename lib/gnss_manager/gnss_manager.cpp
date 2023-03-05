@@ -34,6 +34,12 @@ void copy_fix(GNSS_simple_fix const & in, GNSS_simple_fix & out){
     out.posix_timestamp = in.posix_timestamp;
 }
 
+void GNSS_simple_manager::turn_on_off(void){
+    turn_on();
+    delay(500);
+    turn_off();
+}
+
 uint8_t GNSS_simple_manager::turn_on(void)
 {
     if (use_usb && use_usb_gnss_debug){
@@ -86,16 +92,17 @@ uint8_t GNSS_simple_manager::turn_off(void){
     }
 
     if (use_usb && use_usb_gnss_debug){
-        SERIAL_USB->println(F("gnss end uart"));
-    }
-    GNSS_UART->end();
-    delay(100);
-    wdt.restart();
-
-    if (use_usb && use_usb_gnss_debug){
         SERIAL_USB->println(F("gnss enable low"));
     }
     digitalWrite(GNSS_EN_PIN, LOW);
+    delay(100);
+    wdt.restart();
+
+
+    if (use_usb && use_usb_gnss_debug){
+        SERIAL_USB->println(F("gnss end uart"));
+    }
+    GNSS_UART->end();
     delay(100);
     wdt.restart();
 
