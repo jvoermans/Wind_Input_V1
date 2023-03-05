@@ -13,3 +13,13 @@ GNSS wiring: GNSS | SFA
 - GND | GND
 - VIN | 3.3V
 GNSS pull down: 1kOhm (min), 2kOhm (max), GNSS EN | GNSS GND
+
+SD card: format to FAT
+
+SD wiring (I use an Adafruit SD breakout, SD pin names may be a bit different with other breakouts, but the idea is the same): SD | SFA
+- GND | GND
+- 3v | 3.3V
+- CS | D8
+- CLK | SCK
+- DO | MISO
+- DI | MOSI

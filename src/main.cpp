@@ -24,7 +24,7 @@ uint8_t status {255};
 void setup()
 {
     ////////////////////////////////////////////////////////////////////////////////
-    // startup delay, to avoid super fast restarts etc
+    // startup delay, to avoid super fast restarts etc; avoid to brick
     delay(10000);
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +54,7 @@ void setup()
         wdt.restart();
     }
 
+    // turn the GNSS on and off and sleep a bit, to "warm up" (and test current use, check if anything wrong, etc)
     gnss_simple_manager_instance.turn_on_off();
     sleep_for_seconds(11);
 
