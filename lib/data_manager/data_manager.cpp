@@ -30,10 +30,14 @@ void DataManager::clear_data(void){
     press2.clear();
 }
 
-void DataManager::start_sensors(void){
+void DataManager::gather_dataset(void){
+    clear_data();
 
-}
+    size_t step = 0;
 
-void DataManager::stop_sensors(void){
+    while(step < samples_per_channel_per_file){
 
+        step += 1;
+        wdt.restart();
+    }
 }

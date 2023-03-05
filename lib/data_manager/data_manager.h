@@ -3,6 +3,8 @@
 
 #include "gnss_manager.h"
 
+#include "sensors_manager.h"
+
 #include "Embedded_Template_Library.h"
 #include "etl/vector.h"
 
@@ -31,17 +33,12 @@ class DataManager {
         void gather_dataset(void);
 
         // check that all sensors look good and can be started
-        void check_status_sensors(void);
+        // TODO
+        // void check_status_sensors(void);
 
     private:
         // clear all the buffers
         void clear_data(void);
-
-        // start all the sensors
-        void start_sensors(void);
-        
-        // stop all the sensors
-        void stop_sensors(void);
 };
 
 #endif

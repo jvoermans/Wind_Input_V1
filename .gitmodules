@@ -22,3 +22,9 @@
 [submodule "lib/kiss_clang_posix_time_utils"]
 	path = lib/kiss_clang_posix_time_utils
 	url = git@github.com:jerabaul29/kiss_clang_posix_time_utils.git
+[submodule "lib/Adafruit_AHRS"]
+	path = lib/Adafruit_AHRS
+	url = https://github.com/adafruit/Adafruit_AHRS.git
+[submodule "lib/Adafruit_LIS3MDL"]
+	path = lib/Adafruit_LIS3MDL
+	url = https://github.com/adafruit/Adafruit_LIS3MDL.git

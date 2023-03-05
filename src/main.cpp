@@ -146,7 +146,9 @@ void loop()
         SERIAL_USB->println(F("enable burst mode"));
     }
 
-    // enableBurstMode();
+    enableBurstMode();
+    delay(500);
+    wdt.restart();
 
     ////////////////////////////////////////////////////////////////////////////////
     // log data for the duration of the file
@@ -174,7 +176,9 @@ void loop()
         SERIAL_USB->println(F("disable burst mode"));
     }
 
-    // disableBurstMode();
+    disableBurstMode();
+    delay(500);
+    wdt.restart();
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get end of file lat, lon, time
