@@ -142,7 +142,11 @@ void loop()
 
     ////////////////////////////////////////////////////////////////////////////////
     // we need to take Kalman filter etc; boost
-    enableBurstMode();
+    if (use_usb){
+        SERIAL_USB->println(F("enable burst mode"));
+    }
+
+    // enableBurstMode();
 
     ////////////////////////////////////////////////////////////////////////////////
     // log data for the duration of the file
@@ -151,10 +155,26 @@ void loop()
     }
 
     // data_manager_instance.gather_dataset();
+    delay(1000);
+    wdt.restart();
+    delay(1000);
+    wdt.restart();
+    delay(1000);
+    wdt.restart();
+    delay(1000);
+    wdt.restart();
+    delay(1000);
+    wdt.restart();
+    delay(1000);
+    wdt.restart();
 
     ////////////////////////////////////////////////////////////////////////////////
     // done need to take Kalman filter etc; deboost
-    disableBurstMode();
+    if (use_usb){
+        SERIAL_USB->println(F("disable burst mode"));
+    }
+
+    // disableBurstMode();
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get end of file lat, lon, time
@@ -177,4 +197,10 @@ void loop()
 
     wdt.restart();
     delay(100);
+
+    if (use_usb){
+        SERIAL_USB->println(F("done with logging cycle"));
+    }
+    delay(100);
+    wdt.restart();
 }

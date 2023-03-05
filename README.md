@@ -14,6 +14,8 @@ GNSS wiring: GNSS | SFA
 - VIN | 3.3V
 GNSS pull down: 1kOhm (min), 2kOhm (max), GNSS EN | GNSS GND
 
+NOTE: the GNSS gets fully turned off, so to get fixes fast enough, it MUST have the battery!
+
 SD card: format to FAT
 
 SD wiring (I use an Adafruit SD breakout, SD pin names may be a bit different with other breakouts, but the idea is the same): SD | SFA

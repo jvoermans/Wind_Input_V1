@@ -17,7 +17,7 @@ extern GNSS_simple_fix current_fix_end;
 extern etl::vector<uint16_t, samples_per_channel_per_file> accX;
 extern etl::vector<uint16_t, samples_per_channel_per_file> accY;
 extern etl::vector<uint16_t, samples_per_channel_per_file> accZ;
-extern etl::vector<uint16_t, samples_per_channel_per_file> accN;
+extern etl::vector<uint16_t, samples_per_channel_per_file> accD;
 
 // pressure sensor 1 data
 extern etl::vector<uint16_t, samples_per_channel_per_file> press1;
@@ -27,16 +27,20 @@ extern etl::vector<uint16_t, samples_per_channel_per_file> press2;
 
 class DataManager {
     public:
+        // gather a dataset and fill the samples buffers
         void gather_dataset(void);
 
+        // check that all sensors look good and can be started
         void check_status_sensors(void);
 
     private:
+        // clear all the buffers
         void clear_data(void);
 
-        // NOTE: these use so little current, start but never stop?
+        // start all the sensors
         void start_sensors(void);
         
+        // stop all the sensors
         void stop_sensors(void);
 };
 

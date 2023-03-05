@@ -203,6 +203,10 @@ uint8_t GNSS_simple_manager::get_good_averaged_fix(GNSS_simple_fix & output_fix)
         SERIAL_USB->println(F("gnss get good averaged fix"));
     }
 
+    accumulator_latitude.clear();
+    accumulator_longitude.clear();
+    accumulator_posix.clear();
+
     status = turn_on();
     delay(100);
     wdt.restart();

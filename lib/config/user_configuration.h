@@ -44,13 +44,15 @@ static constexpr uint32_t logging_frequency_hz {20};
 // how often to write to a new file
 // should start when posix_timestamp % file_start_modulo_seconds == 0
 // ie to start every 10 minutes: 10 * 60
-static constexpr uint32_t file_start_modulo_seconds {10 * 60};
+// static constexpr uint32_t file_start_modulo_seconds {10 * 60};
+static constexpr uint32_t file_start_modulo_seconds {1 * 60};  // for test
 
 // how long duration we actually log
 // should be a bit less than the interval between files due to the start modulo, to allow for bookkeeping etc
 // ie to log for 8 minutes at a time per file: 8 * 60
 static constexpr uint32_t file_log_duration_seconds {8 * 60};
-static_assert(file_start_modulo_seconds > (file_log_duration_seconds + 60));
+// TODO: uncomment under when file_start_modulo_seconds is for true values, comment for tests
+// static_assert(file_start_modulo_seconds > (file_log_duration_seconds + 60));
 
 // how many samples this corresponds to
 static constexpr size_t samples_per_channel_per_file {file_log_duration_seconds * logging_frequency_hz};

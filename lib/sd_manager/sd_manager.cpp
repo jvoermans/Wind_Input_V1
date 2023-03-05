@@ -134,12 +134,36 @@ void SD_Manager::log_data(void){
     wdt.restart();
     sd_file.print(F("\n\nGNSS_start_done\n\n\n\nGNSS_end\n\n"));
     wdt.restart();
-    sd_file.write((void *)(&current_fix_start), sizeof(GNSS_simple_fix));
+    sd_file.write((void *)(&current_fix_end), sizeof(GNSS_simple_fix));
     wdt.restart();
     sd_file.print(F("\n\nGNSS_end_done\n\n\n\n"));
     wdt.restart();
     delay(100);
     wdt.restart();
+
+    sd_file.print(F("GNSS_start_string\n\n"));
+    sd_file.println(current_fix_start.year);
+    sd_file.println(current_fix_start.month);
+    sd_file.println(current_fix_start.day);
+    sd_file.println(current_fix_start.hour);
+    sd_file.println(current_fix_start.minute);
+    sd_file.println(current_fix_start.latitude);
+    sd_file.println(current_fix_start.lat_NS);
+    sd_file.println(current_fix_start.longitude);
+    sd_file.print(current_fix_start.lon_EW);
+    sd_file.write("\n\nGNSS_start_string_done\n\n\n\n");
+
+    sd_file.print(F("GNSS_end_string\n\n"));
+    sd_file.println(current_fix_end.year);
+    sd_file.println(current_fix_end.month);
+    sd_file.println(current_fix_end.day);
+    sd_file.println(current_fix_end.hour);
+    sd_file.println(current_fix_end.minute);
+    sd_file.println(current_fix_end.latitude);
+    sd_file.println(current_fix_end.lat_NS);
+    sd_file.println(current_fix_end.longitude);
+    sd_file.print(current_fix_end.lon_EW);
+    sd_file.write("\n\nGNSS_end_string_done\n\n\n\n");
 
     sd_file.print(F("accX_array\n\n"));
     wdt.restart();
@@ -162,11 +186,11 @@ void SD_Manager::log_data(void){
     sd_file.print(F("\n\naccZ_array_done\n\n\n\n"));
     wdt.restart();
 
-    sd_file.print(F("accN_array\n\n"));
+    sd_file.print(F("accD_array\n\n"));
     wdt.restart();
-    sd_file.write((void *)(&accN), sizeof(accN));
+    sd_file.write((void *)(&accD), sizeof(accD));
     wdt.restart();
-    sd_file.print(F("\n\naccN_array_done\n\n\n\n"));
+    sd_file.print(F("\n\naccD_array_done\n\n\n\n"));
     wdt.restart();
 
     sd_file.print(F("press1_array\n\n"));
