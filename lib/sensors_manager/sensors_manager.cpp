@@ -64,7 +64,7 @@ bool IMU_Manager::start_IMU(){
 
   // let a bit of time for the filter to converge; 10 s at 100Hz is 100 updates
   for (int i=0; i<100; i++){
-   get_new_reading(dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout);
+   get_new_reading(dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout);
    wdt.restart();
   }
 
@@ -393,6 +393,10 @@ bool IMU_Manager::update_accumulate_Kalman(void){
    accu_acc_E.push_back(accel_NED.j);
    accu_acc_D.push_back(accel_NED.k);
 
+  accu_acc_x_new.push_back(acc_x);
+  accu_acc_y_new.push_back(acc_y);
+  accu_acc_z_new.push_back(acc_z);
+
    accu_yaw__.push_back(yaw__);
    accu_pitch.push_back(pitch);
    accu_roll_.push_back(roll_);
@@ -405,12 +409,17 @@ bool IMU_Manager::update_accumulate_Kalman(void){
 }
 
 bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, float & acc_D_inout,
-                   float & yaw___inout,   float & pitch_inout, float & roll__inout
+                   float & yaw___inout,   float & pitch_inout, float & roll__inout,
+                    float & acc_x_inout, float & acc_y_inout, float & acc_z_inout
                    ){
    // clear the Kalman output accus
    accu_acc_N.clear();
    accu_acc_E.clear();
    accu_acc_D.clear();
+
+  accu_acc_x_new.clear();
+  accu_acc_y_new.clear();
+  accu_acc_z_new.clear();
 
    accu_yaw__.clear();
    accu_pitch.clear();
@@ -439,6 +448,10 @@ bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, floa
    acc_N_inout = float_mean_filter(accu_acc_N);
    acc_E_inout = float_mean_filter(accu_acc_E);
    acc_D_inout = float_mean_filter(accu_acc_D);
+
+   acc_x_inout = float_mean_filter(accu_acc_x_new);
+   acc_y_inout = float_mean_filter(accu_acc_y_new);
+   acc_z_inout = float_mean_filter(accu_acc_z_new);
 
    yaw___inout = float_mean_filter(accu_yaw__);
    pitch_inout = float_mean_filter(accu_pitch);

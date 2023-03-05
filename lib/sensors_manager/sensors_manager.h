@@ -28,7 +28,8 @@ class IMU_Manager{
 
         // NOTE: we could get more information if we wanted
         bool get_new_reading(float & acc_N_inout, float & acc_E_inout, float & acc_D_inout,
-                             float & yaw___inout, float & pitch_inout, float & roll__inout
+                             float & yaw___inout, float & pitch_inout, float & roll__inout,
+                             float & acc_x_inout, float & acc_y_inout, float & acc_z_inout
                             );
         bool stop_IMU();
 
@@ -68,6 +69,12 @@ class IMU_Manager{
         etl::vector<float, size_dof_accumulators> accu_mag_x;
         etl::vector<float, size_dof_accumulators> accu_mag_y;
         etl::vector<float, size_dof_accumulators> accu_mag_z;
+        //
+        // NOTE: ugly, these accs are x y z accs that are at the same speed as the NED (100Hz Kalman output)
+        // compare with the other ones that are at the speed of the IMU (833Hz)
+        etl::vector<float, size_dof_accumulators> accu_acc_x_new;
+        etl::vector<float, size_dof_accumulators> accu_acc_y_new;
+        etl::vector<float, size_dof_accumulators> accu_acc_z_new;
         //
         etl::vector<float, size_dof_accumulators> accu_acc_N;
         etl::vector<float, size_dof_accumulators> accu_acc_E;
