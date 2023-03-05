@@ -18,6 +18,8 @@ NOTE: the GNSS gets fully turned off, so to get fixes fast enough, it MUST have 
 
 SD card: format to FAT
 
+NOTE: for some reason I ignore, sometimes the files are not visible to my default file explorer GUI, but they are well visible to the ls command.
+
 SD wiring (I use an Adafruit SD breakout, SD pin names may be a bit different with other breakouts, but the idea is the same): SD | SFA
 - GND | GND
 - 3v | 3.3V
