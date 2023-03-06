@@ -44,6 +44,7 @@ static constexpr uint32_t logging_frequency_hz {20};
 // how often to write to a new file
 // should start when posix_timestamp % file_start_modulo_seconds == 0
 // ie to start every 10 minutes: 10 * 60
+// TODO: make sure that the correct value is used for deployment under!
 // static constexpr uint32_t file_start_modulo_seconds {10 * 60};
 static constexpr uint32_t file_start_modulo_seconds {1 * 60};  // for test
 
@@ -62,6 +63,8 @@ static constexpr size_t samples_per_channel_per_file {file_log_duration_seconds 
 // 6 channels, 2B per sample
 // total RAM is 384kB, max use for data storing of 288kB
 static_assert(6 * 2 * samples_per_channel_per_file < 288'000);
+
+static constexpr float data_manager_debug {true};
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // sleep
