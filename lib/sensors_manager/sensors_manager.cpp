@@ -1,7 +1,7 @@
 #include "sensors_manager.h"
 
 Adafruit_ISM330DHCX ism330dhcx;
-Adafruit_LIS3MDL lis3mdl;
+// Adafruit_LIS3MDL lis3mdl;
 Adafruit_NXPSensorFusion Kalman_filter;
 IMU_Manager board_imu_manger;
 
@@ -33,19 +33,19 @@ bool IMU_Manager::start_IMU(){
   Serial.println("ISM330DHCX Found!");
   wdt.restart();
 
-  Serial.println(F("Adafruit LIS3MDL start!"));
-  while (true){
-    if (! lis3mdl.begin_I2C(LIS3MDL_I2CADDR_DEFAULT,
-                     &Wire)) {
-      Serial.println("ERROR Failed to find LIS3MDL chip, will try again...");
-      delay(500);
-    }
-    else{
-      break;
-    }
-  }
-  Serial.println("LIS3MDL Found!");
-  wdt.restart();
+//   Serial.println(F("Adafruit LIS3MDL start!"));
+//   while (true){
+//     if (! lis3mdl.begin_I2C(LIS3MDL_I2CADDR_DEFAULT,
+//                      &Wire)) {
+//       Serial.println("ERROR Failed to find LIS3MDL chip, will try again...");
+//       delay(500);
+//     }
+//     else{
+//       break;
+//     }
+//   }
+//   Serial.println("LIS3MDL Found!");
+//   wdt.restart();
 
    set_sensors_parameters(); 
    delay(100);
@@ -90,16 +90,16 @@ void IMU_Manager::set_sensors_parameters(void){
   delay(500);
   wdt.restart();
 
-  // set the magnetometer properties
-  lis3mdl.setPerformanceMode(LIS3MDL_HIGHMODE);
-  lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE);
-  lis3mdl.setDataRate(LIS3MDL_DATARATE_560_HZ);
-  lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS);
-  lis3mdl.setIntThreshold(500);
-  lis3mdl.configInterrupt(false, false, true, // enable z axis
-                          true, // polarity
-                          false, // don't latch
-                          true); // enabled!
+//   // set the magnetometer properties
+//   lis3mdl.setPerformanceMode(LIS3MDL_HIGHMODE);
+//   lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE);
+//   lis3mdl.setDataRate(LIS3MDL_DATARATE_560_HZ);
+//   lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS);
+//   lis3mdl.setIntThreshold(500);
+//   lis3mdl.configInterrupt(false, false, true, // enable z axis
+//                           true, // polarity
+//                           false, // don't latch
+//                           true); // enabled!
   delay(500);
   wdt.restart();
 }
@@ -224,51 +224,51 @@ void IMU_Manager::print_sensors_information(void){
   }
    wdt.restart();
 
-  // print magneto info
-  Serial.println(F("print magnetometer info"));
-
-  Serial.print("Performance mode set to: ");
-  switch (lis3mdl.getPerformanceMode()) {
-    case LIS3MDL_LOWPOWERMODE: Serial.println("Low"); break;
-    case LIS3MDL_MEDIUMMODE: Serial.println("Medium"); break;
-    case LIS3MDL_HIGHMODE: Serial.println("High"); break;
-    case LIS3MDL_ULTRAHIGHMODE: Serial.println("Ultra-High"); break;
-  }
-   wdt.restart();
-
-  Serial.print("Operation mode set to: ");
-  // Single shot mode will complete conversion and go into power down
-  switch (lis3mdl.getOperationMode()) {
-    case LIS3MDL_CONTINUOUSMODE: Serial.println("Continuous"); break;
-    case LIS3MDL_SINGLEMODE: Serial.println("Single mode"); break;
-    case LIS3MDL_POWERDOWNMODE: Serial.println("Power-down"); break;
-  }
-   wdt.restart();
-
-  Serial.print("Data rate set to: ");
-  switch (lis3mdl.getDataRate()) {
-    case LIS3MDL_DATARATE_0_625_HZ: Serial.println("0.625 Hz"); break;
-    case LIS3MDL_DATARATE_1_25_HZ: Serial.println("1.25 Hz"); break;
-    case LIS3MDL_DATARATE_2_5_HZ: Serial.println("2.5 Hz"); break;
-    case LIS3MDL_DATARATE_5_HZ: Serial.println("5 Hz"); break;
-    case LIS3MDL_DATARATE_10_HZ: Serial.println("10 Hz"); break;
-    case LIS3MDL_DATARATE_20_HZ: Serial.println("20 Hz"); break;
-    case LIS3MDL_DATARATE_40_HZ: Serial.println("40 Hz"); break;
-    case LIS3MDL_DATARATE_80_HZ: Serial.println("80 Hz"); break;
-    case LIS3MDL_DATARATE_155_HZ: Serial.println("155 Hz"); break;
-    case LIS3MDL_DATARATE_300_HZ: Serial.println("300 Hz"); break;
-    case LIS3MDL_DATARATE_560_HZ: Serial.println("560 Hz"); break;
-    case LIS3MDL_DATARATE_1000_HZ: Serial.println("1000 Hz"); break;
-  }
-   wdt.restart();
-
-  Serial.print("Range set to: ");
-  switch (lis3mdl.getRange()) {
-    case LIS3MDL_RANGE_4_GAUSS: Serial.println("+-4 gauss"); break;
-    case LIS3MDL_RANGE_8_GAUSS: Serial.println("+-8 gauss"); break;
-    case LIS3MDL_RANGE_12_GAUSS: Serial.println("+-12 gauss"); break;
-    case LIS3MDL_RANGE_16_GAUSS: Serial.println("+-16 gauss"); break;
-  }
+//  // print magneto info
+//  Serial.println(F("print magnetometer info"));
+//
+//  Serial.print("Performance mode set to: ");
+//   switch (lis3mdl.getPerformanceMode()) {
+//     case LIS3MDL_LOWPOWERMODE: Serial.println("Low"); break;
+//     case LIS3MDL_MEDIUMMODE: Serial.println("Medium"); break;
+//     case LIS3MDL_HIGHMODE: Serial.println("High"); break;
+//     case LIS3MDL_ULTRAHIGHMODE: Serial.println("Ultra-High"); break;
+//   }
+//   wdt.restart();
+//
+//  Serial.print("Operation mode set to: ");
+//  // Single shot mode will complete conversion and go into power down
+//  switch (lis3mdl.getOperationMode()) {
+//    case LIS3MDL_CONTINUOUSMODE: Serial.println("Continuous"); break;
+//    case LIS3MDL_SINGLEMODE: Serial.println("Single mode"); break;
+//    case LIS3MDL_POWERDOWNMODE: Serial.println("Power-down"); break;
+//  }
+//   wdt.restart();
+//
+//  Serial.print("Data rate set to: ");
+//  switch (lis3mdl.getDataRate()) {
+//    case LIS3MDL_DATARATE_0_625_HZ: Serial.println("0.625 Hz"); break;
+//    case LIS3MDL_DATARATE_1_25_HZ: Serial.println("1.25 Hz"); break;
+//    case LIS3MDL_DATARATE_2_5_HZ: Serial.println("2.5 Hz"); break;
+//    case LIS3MDL_DATARATE_5_HZ: Serial.println("5 Hz"); break;
+//    case LIS3MDL_DATARATE_10_HZ: Serial.println("10 Hz"); break;
+//    case LIS3MDL_DATARATE_20_HZ: Serial.println("20 Hz"); break;
+//    case LIS3MDL_DATARATE_40_HZ: Serial.println("40 Hz"); break;
+//    case LIS3MDL_DATARATE_80_HZ: Serial.println("80 Hz"); break;
+//    case LIS3MDL_DATARATE_155_HZ: Serial.println("155 Hz"); break;
+//    case LIS3MDL_DATARATE_300_HZ: Serial.println("300 Hz"); break;
+//    case LIS3MDL_DATARATE_560_HZ: Serial.println("560 Hz"); break;
+//    case LIS3MDL_DATARATE_1000_HZ: Serial.println("1000 Hz"); break;
+//  }
+//   wdt.restart();
+//
+//  Serial.print("Range set to: ");
+//  switch (lis3mdl.getRange()) {
+//    case LIS3MDL_RANGE_4_GAUSS: Serial.println("+-4 gauss"); break;
+//    case LIS3MDL_RANGE_8_GAUSS: Serial.println("+-8 gauss"); break;
+//    case LIS3MDL_RANGE_12_GAUSS: Serial.println("+-12 gauss"); break;
+//    case LIS3MDL_RANGE_16_GAUSS: Serial.println("+-16 gauss"); break;
+//  }
    wdt.restart();
 }
 
@@ -294,9 +294,9 @@ bool IMU_Manager::update_accumulate_Kalman(void){
       Serial.print(F("DEBUG_OUT behind ACC by ")); Serial.println(micros() - time_last_accel_gyro_reading_us - nbr_micros_between_accel_gyro_readings);
    }
 
-   if (micros() - time_last_mag_reading_us > 1.7 * nbr_micros_between_mag_readings){
-      Serial.print(F("DEBUG_OUT behind MAG by ")); Serial.println(micros() - time_last_mag_reading_us - nbr_micros_between_mag_readings);
-   }
+//    if (micros() - time_last_mag_reading_us > 1.7 * nbr_micros_between_mag_readings){
+//       Serial.print(F("DEBUG_OUT behind MAG by ")); Serial.println(micros() - time_last_mag_reading_us - nbr_micros_between_mag_readings);
+//    }
 
    // perform as many measurements as possible while it is time
    while (micros() - time_last_Kalman_update_us < nbr_micros_between_Kalman_update){
@@ -324,18 +324,18 @@ bool IMU_Manager::update_accumulate_Kalman(void){
          stat_nbr_accel_gyro_readings++;
       }
 
-      // if time to read mag, do it
-      if (micros() - time_last_mag_reading_us > nbr_micros_between_mag_readings){
-         time_last_mag_reading_us += nbr_micros_between_mag_readings;
-
-         lis3mdl.getEvent(&mag);
-         
-         accu_mag_x.push_back(mag.magnetic.x);
-         accu_mag_y.push_back(mag.magnetic.y);
-         accu_mag_z.push_back(mag.magnetic.z);
-
-         stat_nbr_mag_readings++;
-      }
+//       // if time to read mag, do it
+//       if (micros() - time_last_mag_reading_us > nbr_micros_between_mag_readings){
+//          time_last_mag_reading_us += nbr_micros_between_mag_readings;
+// 
+//          lis3mdl.getEvent(&mag);
+//          
+//          accu_mag_x.push_back(mag.magnetic.x);
+//          accu_mag_y.push_back(mag.magnetic.y);
+//          accu_mag_z.push_back(mag.magnetic.z);
+// 
+//          stat_nbr_mag_readings++;
+//       }
       
    }
    time_last_Kalman_update_us += nbr_micros_between_Kalman_update;
@@ -351,9 +351,9 @@ bool IMU_Manager::update_accumulate_Kalman(void){
    gyr_y = float_mean_filter(accu_gyr_y) * SENSORS_RADS_TO_DPS;
    gyr_z = float_mean_filter(accu_gyr_z) * SENSORS_RADS_TO_DPS;
 
-   mag_x = float_mean_filter(accu_mag_x);
-   mag_y = float_mean_filter(accu_mag_y);
-   mag_z = float_mean_filter(accu_mag_z);
+//   mag_x = float_mean_filter(accu_mag_x);
+//   mag_y = float_mean_filter(accu_mag_y);
+//   mag_z = float_mean_filter(accu_mag_z);
 
    // unsigned long crrt_micros;
    // crrt_micros = micros();
@@ -364,6 +364,8 @@ bool IMU_Manager::update_accumulate_Kalman(void){
       Kalman_filter.update(gyr_x, gyr_y, gyr_z,
                            acc_x, acc_y, acc_z,
                            mag_x, mag_y, mag_z);
+      SERIAL_USB->println(F("ERR USE NO MAG!"));
+      while (true) {};
    }
    // in case the magnometer is not calibrated, the magnometer does more harm than good, consider switching off then!
    else{

@@ -85,10 +85,10 @@ void DataManager::gather_dataset(void){
         board_imu_manger.get_new_reading(r_acc_n, r_acc_e, r_acc_d, r_yaw, r_pitch, r_roll, r_acc_x, r_acc_y, r_acc_z);
 
         // normalization accel d
-        static constexpr float range_measurement_accel_d = 2.0 * 9.81;  // we have a dynamic range of +-1g; that should be enough on sea ice
-        static constexpr float offset_measurement_accel_d = 2.0 * 9.81;  // d is -2g +0g; to make positive, add 2g
+        static constexpr float range_measurement_accel_d = 2.0 * 9.81;  // we have a dynamic range of +-1g centered on g; that should be enough on sea ice
+        static constexpr float offset_measurement_accel_d = 0.0;  // d measured is 0g +2g; ie acce_d at rest is +g; need no offset
 
-        static constexpr float range_measurement_accel_x_y_z = 4.0 * 9.81;  // x, y, n, e are -2g +2g as we do not know how the chip is pointing; to make positive, add 2g
+        static constexpr float range_measurement_accel_x_y_z = 4.0 * 9.81;  // x, y, z are -2g +2g as we do not know how the chip is pointing; ie range is 4g and to make positive, add 2g
         static constexpr float offset_measurement_accel_x_y_z = 2.0 * 9.81;  // is -2g +2g; to make positive, add 2g
 
         e_acc_x = static_cast<uint16_t>((r_acc_x + offset_measurement_accel_x_y_z) / range_measurement_accel_x_y_z * 65000.0f);
@@ -97,7 +97,8 @@ void DataManager::gather_dataset(void){
 
         e_acc_d = static_cast<uint16_t>((r_acc_d + offset_measurement_accel_d) / range_measurement_accel_d * 65000.0f);
 
-        if (use_usb && data_manager_debug){
+        // if (use_usb && data_manager_debug){
+        if (false){
             // TODO: may be slow; remove some of it? reduce the frequency of printing?
             crrt_millis = millis();
             if (crrt_millis-previous_crrt_millis > 1000) {
