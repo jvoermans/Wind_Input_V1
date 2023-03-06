@@ -50,4 +50,6 @@ class DataManager {
         void clear_data(void);
 };
 
+extern DataManager board_data_manager;
+
 #endif

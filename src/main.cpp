@@ -61,6 +61,16 @@ void setup()
     ////////////////////////////////////////////////////////////////////////////////
     // TODO: CRITICAL: start / check the different sensors and the SD card to check that all looks good
 
+    // TODO: this is just a test, remove later on
+    enableBurstMode();
+    delay(500);
+
+    board_data_manager.gather_dataset();
+
+    disableBurstMode();
+    delay(500);
+    
+
     ////////////////////////////////////////////////////////////////////////////////
     // init the GNSS, get the first GNSS fix;
     // if not GNSS fix, simply go to sleep for 15 minutes before re-trying

@@ -17,6 +17,8 @@ etl::vector<uint16_t, samples_per_channel_per_file + 1> press1;
 // pressure sensor 2 data
 etl::vector<uint16_t, samples_per_channel_per_file + 1> press2;
 
+DataManager board_data_manager;
+
 void DataManager::clear_data(void){
     if (use_usb){
         SERIAL_USB->println(F("clear data manager"));
