@@ -75,6 +75,9 @@ void DataManager::gather_dataset(void){
 
     board_imu_manger.start_IMU();
 
+    unsigned long previous_crrt_millis = millis();
+    unsigned long crrt_millis = 0;
+
     while(step < samples_per_channel_per_file){
 
         board_imu_manger.get_new_reading(r_acc_n, r_acc_e, r_acc_d, r_yaw, r_pitch, r_roll, r_acc_x, r_acc_y, r_acc_z);
@@ -93,20 +96,25 @@ void DataManager::gather_dataset(void){
         e_acc_d = static_cast<uint16_t>((r_acc_d + offset_measurement_accel_d) / range_measurement_accel_d * 65000.0f);
 
         if (use_usb && data_manager_debug){
-            unsigned long crrt_millis = millis();
-            PRINTLN_VAR(crrt_millis);
+            // TODO: may be slow; remove some of it? reduce the frequency of printing?
+            crrt_millis = millis();
+            if (crrt_millis-previous_crrt_millis > 1000) {
+                PRINTLN_VAR(crrt_millis);
 
-            PRINTLN_VAR(r_acc_x);
-            PRINTLN_VAR(e_acc_x);
+                PRINTLN_VAR(r_acc_x);
+                PRINTLN_VAR(e_acc_x);
 
-            PRINTLN_VAR(r_acc_y);
-            PRINTLN_VAR(e_acc_y);
+                PRINTLN_VAR(r_acc_y);
+                PRINTLN_VAR(e_acc_y);
 
-            PRINTLN_VAR(r_acc_z);
-            PRINTLN_VAR(e_acc_z);
+                PRINTLN_VAR(r_acc_z);
+                PRINTLN_VAR(e_acc_z);
 
-            PRINTLN_VAR(r_acc_d);
-            PRINTLN_VAR(e_acc_d);
+                PRINTLN_VAR(r_acc_d);
+                PRINTLN_VAR(e_acc_d);
+
+                previous_crrt_millis += 1000;
+            }
         }
 
         accX.push_back(e_acc_x);
