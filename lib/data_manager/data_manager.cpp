@@ -97,6 +97,8 @@ void DataManager::gather_dataset(void){
 
         e_acc_d = static_cast<uint16_t>((r_acc_d + offset_measurement_accel_d) / range_measurement_accel_d * 65000.0f);
 
+        // TODO: blink a bit or so?
+
         // if (use_usb && data_manager_debug){
         if (false){
             // TODO: may be slow; remove some of it? reduce the frequency of printing?

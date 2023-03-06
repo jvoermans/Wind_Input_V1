@@ -69,6 +69,9 @@ void setup()
 
     disableBurstMode();
     delay(500);
+
+    sd_manager_instance.update_filename(current_fix_start);
+    sd_manager_instance.log_data();
     
 
     ////////////////////////////////////////////////////////////////////////////////
