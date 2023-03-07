@@ -27,3 +27,7 @@ SD wiring (I use an Adafruit SD breakout, SD pin names may be a bit different wi
 - CLK | SCK
 - DO | MISO
 - DI | MOSI
+
+TODO:
+- frequency of measurements?
+- resolution of each kind of data?

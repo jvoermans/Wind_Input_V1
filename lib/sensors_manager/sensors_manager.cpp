@@ -5,6 +5,9 @@ Adafruit_ISM330DHCX ism330dhcx;
 Adafruit_NXPSensorFusion Kalman_filter;
 IMU_Manager board_imu_manger;
 
+BMP388_DEV bmp390_1(Wire);
+BMP388_DEV bmp390_2(Wire);
+
 bool IMU_Manager::start_IMU(){
   Wire.begin();
   delay(100);
@@ -33,6 +36,33 @@ bool IMU_Manager::start_IMU(){
   Serial.println("ISM330DHCX Found!");
   wdt.restart();
 
+  Serial.println(F("start bmp390 1"));
+  while (!bmp390_1.begin(FORCED_MODE, 0x77)){
+    Serial.println(F("issue bmp390 1"));
+    delay(500);
+  }
+  bmp390_1.setTimeStandby(TIME_STANDBY_5MS);
+  bmp390_1.setPresOversampling(OVERSAMPLING_X32);
+  bmp390_1.setTempOversampling(OVERSAMPLING_X2);
+  bmp390_1.setIIRFilter(IIR_FILTER_OFF);
+  wdt.restart();
+  delay(5);
+  Serial.println(F("bmp390 1 started"));
+
+  // TODO: take on and off for 1 or 2 sensors
+  // Serial.println(F("start bmp390 2"));
+  // while (!bmp390_2.begin(FORCED_MODE, 0x77)){
+  //   Serial.println(F("issue bmp390 2"));
+  //   delay(500);
+  // }
+  // bmp390_2.setTimeStandby(TIME_STANDBY_5MS);
+  // bmp390_2.setPresOversampling(OVERSAMPLING_X32);
+  // bmp390_2.setTempOversampling(OVERSAMPLING_X2);
+  // bmp390_2.setIIRFilter(IIR_FILTER_OFF);
+  // wdt.restart();
+  // delay(5);
+  // Serial.println(F("bmp390 2 started"));
+
 //   Serial.println(F("Adafruit LIS3MDL start!"));
 //   while (true){
 //     if (! lis3mdl.begin_I2C(LIS3MDL_I2CADDR_DEFAULT,
@@ -57,6 +87,9 @@ bool IMU_Manager::start_IMU(){
   Kalman_filter.begin(update_frequency_Kalman_Hz);
   wdt.restart();
 
+  bmp390_1.startForcedConversion();
+  delay(100);
+
   time_last_accel_gyro_reading_us = micros();
   time_last_mag_reading_us = micros();
   time_last_Kalman_update_us = micros();
@@ -64,7 +97,7 @@ bool IMU_Manager::start_IMU(){
 
   // let a bit of time for the filter to converge; 10 s at 100Hz is 100 updates
   for (int i=0; i<100; i++){
-   get_new_reading(dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout);
+   get_new_reading(dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout);
    wdt.restart();
   }
 
@@ -412,7 +445,8 @@ bool IMU_Manager::update_accumulate_Kalman(void){
 
 bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, float & acc_D_inout,
                    float & yaw___inout,   float & pitch_inout, float & roll__inout,
-                    float & acc_x_inout, float & acc_y_inout, float & acc_z_inout
+                    float & acc_x_inout, float & acc_y_inout, float & acc_z_inout,
+                    float & press_1_inout, float & press_2_inout
                    ){
    // clear the Kalman output accus
    accu_acc_N.clear();
@@ -435,12 +469,34 @@ bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, floa
       Serial.print(F("DEBUG_OUT behind GNR by ")); Serial.println(micros() - time_last_IMU_update_us - nbr_micros_between_IMU_update);
    }
 
+   int loop_step = 0;
+
    // perform as many kalman updates as possible while it is time
    while (micros() - time_last_IMU_update_us < nbr_micros_between_IMU_update){
       if(!update_accumulate_Kalman()){
         Serial.println(F("ERROR cannot get new IMU Kalman reading"));
         return false;
       }
+
+      // NOTE: put the press stuff in the middle of the Kalman running, so that happens at time when not too much to do, to reduce delay issues
+      // and in 2 different loop updates, to avoid issues with double delay
+      if (loop_step == 5){
+        // Serial.println(F("start press stuff"));
+        // Serial.println(micros());
+        bmp390_1.getPressure(press_1);
+        // Serial.println(micros());
+        press_1_inout = press_1;
+        bmp390_1.startForcedConversion();
+        // Serial.println(micros());
+      }
+      if (loop_step == 6){
+        // TODO: take on and off for 1 or 2 sensors
+        // bmp390_2.getPressure(press_2);
+        // press_2_inout = press_2;
+        // bmp390_2.startForcedConversion();
+      }
+
+      loop_step += 1;
    }
    time_last_IMU_update_us += nbr_micros_between_IMU_update;
 

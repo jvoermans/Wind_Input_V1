@@ -28,11 +28,9 @@ extern etl::vector<uint16_t, samples_per_channel_per_file + 1> accY;
 extern etl::vector<uint16_t, samples_per_channel_per_file + 1> accZ;
 extern etl::vector<uint16_t, samples_per_channel_per_file + 1> accD;
 
-// pressure sensor 1 data
-extern etl::vector<uint16_t, samples_per_channel_per_file + 1> press1;
-
-// pressure sensor 2 data
-extern etl::vector<uint16_t, samples_per_channel_per_file + 1> press2;
+// pressure sensor 1 and 2 data
+extern etl::vector<uint32_t, samples_per_channel_per_file + 1> press1;
+extern etl::vector<uint32_t, samples_per_channel_per_file + 1> press2;
 
 // ----------
 

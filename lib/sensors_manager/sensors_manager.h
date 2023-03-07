@@ -10,6 +10,8 @@
 #include <Adafruit_AHRS.h>
 #include "kiss_clang_3d.h"
 
+#include <BMP388_DEV.h>
+
 #include "Embedded_Template_Library.h"
 #include "etl/vector.h"
 
@@ -29,7 +31,8 @@ class IMU_Manager{
         // NOTE: we could get more information if we wanted
         bool get_new_reading(float & acc_N_inout, float & acc_E_inout, float & acc_D_inout,
                              float & yaw___inout, float & pitch_inout, float & roll__inout,
-                             float & acc_x_inout, float & acc_y_inout, float & acc_z_inout
+                             float & acc_x_inout, float & acc_y_inout, float & acc_z_inout,
+                             float & press_1_inout, float & press_2_inout
                             );
         bool stop_IMU();
 
@@ -48,8 +51,10 @@ class IMU_Manager{
         static constexpr unsigned long nbr_micros_between_mag_readings {1785UL};
         // run the Kalman filtering at 100Hz
         static constexpr unsigned long nbr_micros_between_Kalman_update {10000UL};
-        // run the output for the wave data at 20Hz (double the usual)
-        static constexpr unsigned long nbr_micros_between_IMU_update {50000UL};
+        // TODO: choose the correct micros between update below
+        // run the output for the wave data at 20Hz (double the usual) or at 10Hz (the usual), should match the user_configuration
+        // static constexpr unsigned long nbr_micros_between_IMU_update {50000UL};
+        static constexpr unsigned long nbr_micros_between_IMU_update {100000UL};
 
         unsigned long time_last_accel_gyro_reading_us {0UL};
         unsigned long time_last_mag_reading_us {0UL};
@@ -109,6 +114,13 @@ class IMU_Manager{
         float qj;
         float qk;
 
+        volatile float press_1;
+        volatile float temp_1;
+        volatile float alt_1;
+        volatile float press_2;
+        volatile float temp_2;
+        volatile float alt_2;
+
         Vec3 accel_raw;
         Vec3 accel_NED;
         Quat quat_rotation;
@@ -129,5 +141,8 @@ extern Adafruit_ISM330DHCX ism330dhcx;
 extern Adafruit_LIS3MDL lis3mdl;
 extern Adafruit_NXPSensorFusion Kalman_filter;
 extern IMU_Manager board_imu_manger;
+
+extern BMP388_DEV bmp390_1;
+extern BMP388_DEV bmp390_2;
 
 #endif
