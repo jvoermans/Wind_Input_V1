@@ -42,7 +42,7 @@ bool IMU_Manager::start_IMU(){
     delay(500);
   }
   bmp390_1.setTimeStandby(TIME_STANDBY_5MS);
-  bmp390_1.setPresOversampling(OVERSAMPLING_X32);
+  bmp390_1.setPresOversampling(OVERSAMPLING_X16);
   bmp390_1.setTempOversampling(OVERSAMPLING_X2);
   bmp390_1.setIIRFilter(IIR_FILTER_OFF);
   wdt.restart();
@@ -56,7 +56,7 @@ bool IMU_Manager::start_IMU(){
   //   delay(500);
   // }
   // bmp390_2.setTimeStandby(TIME_STANDBY_5MS);
-  // bmp390_2.setPresOversampling(OVERSAMPLING_X32);
+  // bmp390_2.setPresOversampling(OVERSAMPLING_X16);
   // bmp390_2.setTempOversampling(OVERSAMPLING_X2);
   // bmp390_2.setIIRFilter(IIR_FILTER_OFF);
   // wdt.restart();
@@ -480,7 +480,7 @@ bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, floa
 
       // NOTE: put the press stuff in the middle of the Kalman running, so that happens at time when not too much to do, to reduce delay issues
       // and in 2 different loop updates, to avoid issues with double delay
-      if (loop_step == 5){
+      if (loop_step == 2){
         // Serial.println(F("start press stuff"));
         // Serial.println(micros());
         bmp390_1.getPressure(press_1);
@@ -489,7 +489,7 @@ bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, floa
         bmp390_1.startForcedConversion();
         // Serial.println(micros());
       }
-      if (loop_step == 6){
+      if (loop_step == 3){
         // TODO: take on and off for 1 or 2 sensors
         // bmp390_2.getPressure(press_2);
         // press_2_inout = press_2;

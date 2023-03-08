@@ -26,7 +26,8 @@ extern GNSS_simple_fix current_fix_end;
 extern etl::vector<uint16_t, samples_per_channel_per_file + 1> accX;
 extern etl::vector<uint16_t, samples_per_channel_per_file + 1> accY;
 extern etl::vector<uint16_t, samples_per_channel_per_file + 1> accZ;
-extern etl::vector<uint16_t, samples_per_channel_per_file + 1> accD;
+// TODO: enough space to add uint16_t for gyr, yaw, pitch, roll; add here, in the logging, in the dumping, and in the size estimate of user_configuration
+extern etl::vector<uint32_t, samples_per_channel_per_file + 1> accD;
 
 // pressure sensor 1 and 2 data
 extern etl::vector<uint32_t, samples_per_channel_per_file + 1> press1;

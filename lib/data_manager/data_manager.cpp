@@ -9,7 +9,7 @@ GNSS_simple_fix current_fix_end;
 etl::vector<uint16_t, samples_per_channel_per_file + 1> accX;
 etl::vector<uint16_t, samples_per_channel_per_file + 1> accY;
 etl::vector<uint16_t, samples_per_channel_per_file + 1> accZ;
-etl::vector<uint16_t, samples_per_channel_per_file + 1> accD;
+etl::vector<uint32_t, samples_per_channel_per_file + 1> accD;
 
 // pressure sensor 1 and 2 data
 etl::vector<uint32_t, samples_per_channel_per_file + 1> press1;
@@ -98,7 +98,7 @@ void DataManager::gather_dataset(void){
         e_acc_y = static_cast<uint16_t>((r_acc_y + offset_measurement_accel_x_y_z) / range_measurement_accel_x_y_z * 65000.0f);
         e_acc_z = static_cast<uint16_t>((r_acc_z + offset_measurement_accel_x_y_z) / range_measurement_accel_x_y_z * 65000.0f);
 
-        e_acc_d = static_cast<uint16_t>((r_acc_d + offset_measurement_accel_d) / range_measurement_accel_d * 65000.0f);
+        e_acc_d = static_cast<uint32_t>((r_acc_d + offset_measurement_accel_d) / range_measurement_accel_d * 4294900000.0f);
 
         e_press1 = static_cast<uint32_t>((r_press_1 + offset_press) / range_press * 4294900000.0f);
         e_press2 = static_cast<uint32_t>((r_press_2 + offset_press) / range_press * 4294900000.0f);

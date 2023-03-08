@@ -53,8 +53,8 @@ class IMU_Manager{
         static constexpr unsigned long nbr_micros_between_Kalman_update {10000UL};
         // TODO: choose the correct micros between update below
         // run the output for the wave data at 20Hz (double the usual) or at 10Hz (the usual), should match the user_configuration
-        // static constexpr unsigned long nbr_micros_between_IMU_update {50000UL};
-        static constexpr unsigned long nbr_micros_between_IMU_update {100000UL};
+        static constexpr unsigned long nbr_micros_between_IMU_update {50000UL};
+        // static constexpr unsigned long nbr_micros_between_IMU_update {100000UL};
 
         unsigned long time_last_accel_gyro_reading_us {0UL};
         unsigned long time_last_mag_reading_us {0UL};

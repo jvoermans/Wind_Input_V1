@@ -39,7 +39,7 @@ static_assert(std::is_same<uint32_t,unsigned long>::value);
 // logging
 
 // logging frequency of the data to SD card
-static constexpr uint32_t logging_frequency_hz {10};
+static constexpr uint32_t logging_frequency_hz {20};
 
 // how often to write to a new file
 // should start when posix_timestamp % file_start_modulo_seconds == 0
@@ -59,10 +59,9 @@ static_assert(file_start_modulo_seconds > (file_log_duration_seconds + 60));
 static constexpr size_t samples_per_channel_per_file {file_log_duration_seconds * logging_frequency_hz};
 
 // assert this uses less than 75% RAM
-// we plan on logging 6 quantities, as uint16_t, i.e.
-// 6 channels, 2B per sample
-// total RAM is 384kB, max use for data storing of 288kB
-static_assert(6 * 2 * samples_per_channel_per_file < 288'000);
+// total RAM is 384kB, max use for data storing of 288kB (increase to 290k)
+// the (+) is the number of bytes per reading: sum of individual element types in data_manager.h vectors
+static_assert((2+2+2+4+4+4) * samples_per_channel_per_file < 290'000);
 
 static constexpr float data_manager_debug {true};
 

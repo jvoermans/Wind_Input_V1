@@ -165,44 +165,46 @@ void SD_Manager::log_data(void){
     sd_file.print(current_fix_end.lon_EW);
     sd_file.write("\n\nGNSS_end_string_done\n\n\n\n");
 
+    // write((void *)(samples.data()), sizeof(uint16_t) * samples.max_size());
+
     sd_file.print(F("accX_array\n\n"));
     wdt.restart();
-    sd_file.write((void *)(&accX), sizeof(accX));
+    sd_file.write((void *)(accX.data()), sizeof(uint16_t) * accX.max_size());
     wdt.restart();
     sd_file.print(F("\n\naccX_array_done\n\n\n\n"));
     wdt.restart();
 
     sd_file.print(F("accY_array\n\n"));
     wdt.restart();
-    sd_file.write((void *)(&accY), sizeof(accY));
+    sd_file.write((void *)(accY.data()), sizeof(uint16_t) * accY.max_size());
     wdt.restart();
     sd_file.print(F("\n\naccY_array_done\n\n\n\n"));
     wdt.restart();
 
     sd_file.print(F("accZ_array\n\n"));
     wdt.restart();
-    sd_file.write((void *)(&accZ), sizeof(accZ));
+    sd_file.write((void *)(accZ.data()), sizeof(uint16_t) * accZ.max_size());
     wdt.restart();
     sd_file.print(F("\n\naccZ_array_done\n\n\n\n"));
     wdt.restart();
 
     sd_file.print(F("accD_array\n\n"));
     wdt.restart();
-    sd_file.write((void *)(&accD), sizeof(accD));
+    sd_file.write((void *)(accD.data()), sizeof(uint32_t) * accD.max_size());
     wdt.restart();
     sd_file.print(F("\n\naccD_array_done\n\n\n\n"));
     wdt.restart();
 
     sd_file.print(F("press1_array\n\n"));
     wdt.restart();
-    sd_file.write((void *)(&press1), sizeof(press1));
+    sd_file.write((void *)(press1.data()), sizeof(uint32_t) * press1.max_size());
     wdt.restart();
     sd_file.print(F("\n\npress1_array_done\n\n\n\n"));
     wdt.restart();
 
     sd_file.print(F("press2_array\n\n"));
     wdt.restart();
-    sd_file.write((void *)(&press2), sizeof(press2));
+    sd_file.write((void *)(press2.data()), sizeof(uint32_t) * press2.max_size());
     wdt.restart();
     sd_file.print(F("\n\npress2_array_done\n\n\n\n"));
     wdt.restart();
