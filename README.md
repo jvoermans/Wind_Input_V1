@@ -4,7 +4,7 @@
   - other: in platformio.ini, use the dummy subsection flags for the build_flags
 - overview of the wiring (from https://github.com/jvoermans/Wind_Input_V1/issues/14):
 
-![logger_wiring](https://user-images.githubusercontent.com/8382834/211499048-af84b316-dbda-4347-968a-b339c1cd982c.png) : note: this is partially out of date
+![logger_wiring](https://github.com/jvoermans/Wind_Input_V1/blob/logger_version_jr/IMG_20230308_202012.jpg) : note: this is partially out of date
 
 GNSS wiring: GNSS | SFA
 - TX | RX1
