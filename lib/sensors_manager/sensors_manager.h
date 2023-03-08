@@ -135,6 +135,9 @@ class IMU_Manager{
         int stat_nbr_accel_gyro_readings;
         int stat_nbr_mag_readings;
         int stat_nbr_kalman_updates;
+
+        uint32_t counter_loop_steps {0};
+        bool state_LED {0};
 };
 
 extern Adafruit_ISM330DHCX ism330dhcx;

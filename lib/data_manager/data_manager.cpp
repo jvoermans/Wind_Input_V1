@@ -103,11 +103,9 @@ void DataManager::gather_dataset(void){
         e_press1 = static_cast<uint32_t>((r_press_1 + offset_press) / range_press * 4294900000.0f);
         e_press2 = static_cast<uint32_t>((r_press_2 + offset_press) / range_press * 4294900000.0f);
 
-        // TODO: blink a bit or so?
-
+        // if want to debug...
         // if (use_usb && data_manager_debug){
         if (false){
-            // TODO: may be slow; remove some of it? reduce the frequency of printing?
             crrt_millis = millis();
             if (crrt_millis-previous_crrt_millis > 1000) {
                 PRINTLN_VAR(crrt_millis);

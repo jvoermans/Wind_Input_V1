@@ -9,6 +9,7 @@ BMP388_DEV bmp390_1(Wire);
 BMP388_DEV bmp390_2(Wire);
 
 bool IMU_Manager::start_IMU(){
+  pinMode(LED_BUILTIN, OUTPUT);
   Wire.begin();
   delay(100);
   Wire.setClock(1000000);
@@ -107,6 +108,8 @@ bool IMU_Manager::start_IMU(){
 bool IMU_Manager::stop_IMU(){
    disableBurstMode();
    delay(100);
+
+   pinMode(LED_BUILTIN, INPUT);
 
    return true;
 }
@@ -323,7 +326,7 @@ bool IMU_Manager::update_accumulate_Kalman(void){
       Serial.print(F("DEBUG_OUT behind UAC by ")); Serial.println(micros() - time_last_Kalman_update_us - nbr_micros_between_Kalman_update);
    }
 
-   if (micros() - time_last_accel_gyro_reading_us > 1.7 * nbr_micros_between_accel_gyro_readings){
+   if (micros() - time_last_accel_gyro_reading_us > 2.5 * nbr_micros_between_accel_gyro_readings){
       Serial.print(F("DEBUG_OUT behind ACC by ")); Serial.println(micros() - time_last_accel_gyro_reading_us - nbr_micros_between_accel_gyro_readings);
    }
 
@@ -448,6 +451,13 @@ bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, floa
                     float & acc_x_inout, float & acc_y_inout, float & acc_z_inout,
                     float & press_1_inout, float & press_2_inout
                    ){
+
+    counter_loop_steps += 1;
+    if (counter_loop_steps % 10 == 0){
+      state_LED = !state_LED;
+      digitalWrite(LED_BUILTIN, state_LED);
+    }
+
    // clear the Kalman output accus
    accu_acc_N.clear();
    accu_acc_E.clear();
@@ -480,7 +490,7 @@ bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, floa
 
       // NOTE: put the press stuff in the middle of the Kalman running, so that happens at time when not too much to do, to reduce delay issues
       // and in 2 different loop updates, to avoid issues with double delay
-      if (loop_step == 2){
+      if (loop_step == 1){
         // Serial.println(F("start press stuff"));
         // Serial.println(micros());
         bmp390_1.getPressure(press_1);
@@ -489,7 +499,7 @@ bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, floa
         bmp390_1.startForcedConversion();
         // Serial.println(micros());
       }
-      if (loop_step == 3){
+      if (loop_step == 2){
         // TODO: take on and off for 1 or 2 sensors
         // bmp390_2.getPressure(press_2);
         // press_2_inout = press_2;
@@ -499,6 +509,10 @@ bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, floa
       loop_step += 1;
    }
    time_last_IMU_update_us += nbr_micros_between_IMU_update;
+
+   if (loop_step < 2){
+    Serial.println(F("ERR: bmp were all not read due to low loop_step"));
+   }
 
    // enableBurstMode();
 

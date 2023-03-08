@@ -28,6 +28,10 @@ SD wiring (I use an Adafruit SD breakout, SD pin names may be a bit different wi
 - DO | MISO
 - DI | MOSI
 
-TODO:
-- frequency of measurements?
-- resolution of each kind of data?
+press1 wiring:
+- for now, Redboard qwiic connector -> press1 qwiic (any of the 2 qwiic ports) (though should be able to use GND, 3.3V, SDA, SCL)
+
+imu wiring:
+- for now, press1 qwiic -> (any of the 2 qwiic ports, the one that is left unconnected from the previous step) -> ism330dhcx qwiic port
+
+NOTE: only 1 pressure sensor for now, but could use 2 whenever needed (just need to enable in code)

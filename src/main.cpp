@@ -62,17 +62,15 @@ void setup()
     // TODO: CRITICAL: start / check the different sensors and the SD card to check that all looks good
 
     // TODO: this is just a test, remove later on
-    enableBurstMode();
-    delay(500);
-
-    board_data_manager.gather_dataset();
-
-    disableBurstMode();
-    delay(500);
-
-    sd_manager_instance.update_filename(current_fix_start);
-    sd_manager_instance.log_data();
-    
+    if (false){
+        enableBurstMode();
+        delay(500);
+        board_data_manager.gather_dataset();
+        disableBurstMode();
+        delay(500);
+        sd_manager_instance.update_filename(current_fix_start);
+        sd_manager_instance.log_data();
+    }
 
     ////////////////////////////////////////////////////////////////////////////////
     // init the GNSS, get the first GNSS fix;
@@ -169,19 +167,7 @@ void loop()
         SERIAL_USB->println(F("log data"));
     }
 
-    // data_manager_instance.gather_dataset();
-    delay(1000);
-    wdt.restart();
-    delay(1000);
-    wdt.restart();
-    delay(1000);
-    wdt.restart();
-    delay(1000);
-    wdt.restart();
-    delay(1000);
-    wdt.restart();
-    delay(1000);
-    wdt.restart();
+    board_data_manager.gather_dataset();
 
     ////////////////////////////////////////////////////////////////////////////////
     // done need to take Kalman filter etc; deboost
