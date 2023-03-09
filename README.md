@@ -12,7 +12,7 @@ GNSS wiring: GNSS | SFA
 - EN | D2
 - GND | GND
 - VIN | 3.3V
-GNSS pull down: 1kOhm (min), 2kOhm (max), GNSS EN | GNSS GND
+- GNSS pull down: 1kOhm (min), 2kOhm (max), GNSS EN | GNSS GND
 
 NOTE: the GNSS gets fully turned off, so to get fixes fast enough, it MUST have the battery!
 
