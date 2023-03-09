@@ -31,16 +31,16 @@ for crrt_file in basepath.glob("*.dat"):
     # a bit of plotting in case this is a data file;
     # plot the 2 most important things: accD and press1
     if kind == "data_file":
-        sample_rate_hz = 20
+        time_start = data.fix_start.datetime_fix
 
         plt.figure()
         plt.plot(local_timebase_s, data.accD)
-        plt.xlabel("s since start")
+        plt.xlabel(f"seconds since {time_start}")
         plt.ylabel("accD [m/s2]")
 
         plt.figure()
         plt.plot(local_timebase_s, data.press1)
-        plt.xlabel("s since start")
+        plt.xlabel(f"seconds since {time_start}")
         plt.ylabel("press1 [hPa]")
 
         plt.show()
