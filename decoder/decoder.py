@@ -14,6 +14,8 @@ from dataclasses import dataclass
 # import pprint
 import prettyprinter as pp
 
+import numpy as np
+
 from pathlib import Path
 
 # ------------------------------------------------------------------------------------------
@@ -53,9 +55,13 @@ class Data_Message:
 
 # ------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------
-# "magic" semaphore strings to look for in files
+# "magic" semaphore strings, values, etc, to decode files
 
 # for files of kind data
+
+n_samples_per_buffer = 20 * 8 * 60 + 1
+float_value_decode_uint16_t = 65000.0
+float_value_decode_uint32_t = 4294900000.0
 
 string_data_start_gnss_start = b"\n\nDATA\n\n\n\nGNSS_start\n\n"
 string_data_start_gnss_done_end_gnss_start = b"\n\nGNSS_start_done\n\n\n\nGNSS_end\n\n"
@@ -125,6 +131,44 @@ list_expected_strings_bootfile = [
 # ------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------
 # utility functions
+
+def get_string_start_idx(data_buffer: str, string: str) -> int:
+    return data_buffer.find(string)
+
+
+def get_string_startnext_idx(data_buffer: str, string: str) -> int:
+    """Find the index of the start of the str following the first
+    appearance of string in data_buffer."""
+    return data_buffer.find(string) + len(string)
+
+
+def get_buffer_inbetween_strings(data_buffer: str, string_start: str, string_end: str) -> str:
+    """Find the part of the buffer in between string_start and string_end,
+    ie between the end of string_start and the start of string_end."""
+    idx_start = get_string_startnext_idx(data_buffer, string_start)
+    idx_end = get_string_start_idx(data_buffer, string_end)
+    return data_buffer[idx_start:idx_end]
+
+
+def decode_uint_buffer_inbetween_strings(data_buffer: str, string_start: str, string_end: str, kind: str) -> str:
+    """Decode the uint buffer from data_buffer in between string delimiters string_start and string_end.
+    The kind is either H for uint16_t, or I for uint32_t. The length is the length of the data buffers."""
+
+    if kind == "H":
+        typesize = 2
+    elif kind == "I":
+        typesize = 4
+    else:
+        raise RuntimeError(f"Unknown typesize kind; expect H or I, got {kind}")
+
+    data = get_buffer_inbetween_strings(data_buffer, string_start, string_end)
+    assert len(data) == typesize * n_samples_per_buffer
+    array_uint = struct.unpack('<' + n_samples_per_buffer * kind, data)
+
+    # we always discard the last entry, which is always 0 and is not used (just "0-semaphore")
+    array_uint = array_uint[:-1]
+
+    return array_uint
 
 
 def identify_file_kind(path_to_file: Path) -> str:
@@ -243,23 +287,21 @@ idx_end_gnss_end = data.find(string_data_end_gnss_done_ascii)
 string_data_end_gnss = data[idx_end_gnss_start: idx_end_gnss_end]
 gnss_fix_end = decode_gnss_ascii_string(string_data_end_gnss)
 
-idx_accX_start =
-idx_accX_end =
+data_accX = get_buffer_inbetween_strings(
+    data,
+    string_data_accx_start,
+    string_data_accx_end
+)
 
-idx_accY_start =
-idx_accY_end =
+array_uint16 = decode_uint_buffer_inbetween_strings(
+    data,
+    string_data_accx_start,
+    string_data_accx_end,
+    "H"
+)
 
-idx_accZ_start =
-idx_accZ_end =
-
-idx_accD_start =
-idx_accD_end =
-
-idx_press1_start =
-idx_press1_end =
-
-idx_press2_start =
-idx_press2_end =
+np_accX = (np.array(array_uint16, dtype=np.float32) / float_value_decode_uint16_t) * (4.0 * 9.81) - (2.0 * 9.81)
+ic(np_accX)
 
 result = Data_Message(
     fix_start=gnss_fix_start,
