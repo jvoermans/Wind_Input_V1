@@ -1,4 +1,3 @@
-
 # ------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------
 # preamble
@@ -12,7 +11,7 @@ from dataclasses import dataclass
 
 # use pprint for python above 3.10, prettyprinter otherwise
 # import pprint
-import prettyprinter as pp
+# import prettyprinter as pp
 
 import numpy as np
 
@@ -35,7 +34,7 @@ datetime_utc_timezone = datetime.timezone.utc
 
 ic.configureOutput(prefix="", outputFunction=print)
 
-pp.install_extras()
+# pp.install_extras()
 
 # ------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------
@@ -66,6 +65,10 @@ class Data_Message:
 # for files of kind data
 
 n_samples_per_buffer = 20 * 8 * 60 + 1
+np_data_length = 20 * 8 * 60
+
+local_timebase_s = np.arange(0.0, np_data_length * 1.0 / 20.0, 1.0 / 20.0)
+
 float_value_decode_uint16_t = 65000.0
 float_value_decode_uint32_t = 4294900000.0
 
@@ -370,19 +373,20 @@ def decode_file(path_to_file: Path) -> (str, type):
 # ------------------------------------------------------------------------------------------
 # for now, decode as a script, will make into function soon
 
-# ------------------------------------------------------------------------------------------
-# file bootfile kind
-file_to_decode_start = Path("./../data/2023-03-09-19-35.dat")
+if __name__ == "__main__":
+    # ------------------------------------------------------------------------------------------
+    # file bootfile kind
+    file_to_decode_start = Path("./../data/2023-03-09-19-35.dat")
 
-(kind, data) = decode_file(file_to_decode_start)
-ic(kind)
-ic(data)
+    (kind, data) = decode_file(file_to_decode_start)
+    ic(kind)
+    ic(data)
 
-# ------------------------------------------------------------------------------------------
-# file datafile kind
-file_to_decode_data = Path("./../data/2023-03-09-19-42.dat")
+    # ------------------------------------------------------------------------------------------
+    # file datafile kind
+    file_to_decode_data = Path("./../data/2023-03-09-19-42.dat")
 
-(kind, data) = decode_file(file_to_decode_data)
-ic(kind)
-ic(data)
+    (kind, data) = decode_file(file_to_decode_data)
+    ic(kind)
+    ic(data)
 
