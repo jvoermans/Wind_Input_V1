@@ -37,11 +37,13 @@ for crrt_file in basepath.glob("*.dat"):
         plt.plot(local_timebase_s, data.accD)
         plt.xlabel(f"seconds since {time_start}")
         plt.ylabel("accD [m/s2]")
+        plt.tight_layout()
 
         plt.figure()
         plt.plot(local_timebase_s, data.press1)
         plt.xlabel(f"seconds since {time_start}")
         plt.ylabel("press1 [hPa]")
+        plt.tight_layout()
 
         plt.show()
 
