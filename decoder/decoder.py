@@ -52,6 +52,12 @@ class GNSS_Packet:
 class Data_Message:
     fix_start: GNSS_Packet
     fix_end : GNSS_Packet
+    accX: np.ndarray
+    accY: np.ndarray
+    accZ: np.ndarray
+    accD: np.ndarray
+    press1: np.ndarray
+    press2: np.ndarray
 
 # ------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------
@@ -150,7 +156,7 @@ def get_buffer_inbetween_strings(data_buffer: str, string_start: str, string_end
     return data_buffer[idx_start:idx_end]
 
 
-def decode_uint_buffer_inbetween_strings(data_buffer: str, string_start: str, string_end: str, kind: str) -> str:
+def decode_uint_buffer_inbetween_strings(data_buffer: str, string_start: str, string_end: str, kind: str) -> list:
     """Decode the uint buffer from data_buffer in between string delimiters string_start and string_end.
     The kind is either H for uint16_t, or I for uint32_t. The length is the length of the data buffers."""
 
@@ -169,6 +175,27 @@ def decode_uint_buffer_inbetween_strings(data_buffer: str, string_start: str, st
     array_uint = array_uint[:-1]
 
     return array_uint
+
+
+def denormalize_uint_array(uint_array_in: list, kind: str, range_data: float, offset_data: float) -> np.ndarray:
+    """Denormalize uint_array_in of kind (uint16_t: 'H', uint32_t: 'I'), with range and
+    offset as given, into a np array of physical values."""
+
+    if kind == "H":
+        float_decode = float_value_decode_uint16_t
+    elif kind == "I":
+        float_decode = float_value_decode_uint32_t
+        ic(uint_array_in)
+    else:
+        raise RuntimeError(f"Unknown typesize kind; expect H or I, got {kind}")
+
+    return np.array(uint_array_in, dtype=np.float32) / float_decode * range_data - offset_data
+
+
+def get_decoded_denormalized_array(data_buffer: str, string_start: str, string_end:str, kind: str, range_data: float, offset_data:float) -> np.ndarray:
+    array_uint = decode_uint_buffer_inbetween_strings(data_buffer, string_start, string_end, kind)
+    array_out = denormalize_uint_array(array_uint, kind, range_data, offset_data)
+    return array_out
 
 
 def identify_file_kind(path_to_file: Path) -> str:
@@ -230,9 +257,9 @@ def decode_start_file(path_to_file: Path) -> GNSS_Packet:
 
     assert data.find(string_boot_gnss_binary_start) == 0
 
-    idx_start_gnss_binary = len(string_boot_gnss_binary_start)
+    # idx_start_gnss_binary = len(string_boot_gnss_binary_start)
     idx_end_gnss_binary = data.find(string_boot_gnss_binary_done_gnss_ascii_start)
-    string_boot_gnss_raw = data[idx_start_gnss_binary:idx_end_gnss_binary]
+    # string_boot_gnss_raw = data[idx_start_gnss_binary:idx_end_gnss_binary]
 
     idx_start_gnss_ascii = idx_end_gnss_binary + len(string_boot_gnss_binary_done_gnss_ascii_start)
     idx_end_gnss_ascii = data.find(string_boot_gnss_ascii_done_file_done)
@@ -240,6 +267,94 @@ def decode_start_file(path_to_file: Path) -> GNSS_Packet:
     gnss_fix = decode_gnss_ascii_string(string_boot_gnss_ascii)
 
     return gnss_fix
+
+
+def decode_data_file(path_to_file:Path) -> Data_Message:
+    with open(path_to_file, "br") as fh:
+        data = fh.read()
+
+    for crrt_bstr in list_expected_strings_datafile:
+        assert crrt_bstr in data
+
+    assert data.find(string_data_start_gnss_start) == 0
+
+    idx_start_gnss_start = data.find(string_data_start_gnss_start_ascii) + len(string_data_start_gnss_start_ascii)
+    idx_start_gnss_end = data.find(string_data_start_gnss_done_ascii)
+    string_data_start_gnss = data[idx_start_gnss_start: idx_start_gnss_end]
+    gnss_fix_start = decode_gnss_ascii_string(string_data_start_gnss)
+
+    idx_end_gnss_start = data.find(string_data_end_gnss_start_ascii) + len(string_data_end_gnss_start_ascii)
+    idx_end_gnss_end = data.find(string_data_end_gnss_done_ascii)
+    string_data_end_gnss = data[idx_end_gnss_start: idx_end_gnss_end]
+    gnss_fix_end = decode_gnss_ascii_string(string_data_end_gnss)
+
+    np_accX = get_decoded_denormalized_array(
+        data,
+        string_data_accx_start,
+        string_data_accx_end,
+        "H",
+        4.0 * 9.81,
+        2.0 * 9.81
+    )
+
+    np_accY = get_decoded_denormalized_array(
+        data,
+        string_data_accy_start,
+        string_data_accy_end,
+        "H",
+        4.0 * 9.81,
+        2.0 * 9.81
+    )
+
+    np_accZ = get_decoded_denormalized_array(
+        data,
+        string_data_accz_start,
+        string_data_accz_end,
+        "H",
+        4.0 * 9.81,
+        2.0 * 9.81
+    )
+
+    # TODO: check / fix
+    np_accD = get_decoded_denormalized_array(
+        data,
+        string_data_accd_start,
+        string_data_accd_end,
+        "I",
+        2.0 * 9.81,
+        0.0
+    )
+
+    np_press1 = get_decoded_denormalized_array(
+        data,
+        string_data_press1_start,
+        string_data_press1_end,
+        "I",
+        250.0,
+        -850.0
+    )
+
+    np_press2 = get_decoded_denormalized_array(
+        data,
+        string_data_press2_start,
+        string_data_press2_end,
+        "I",
+        250.0,
+        -850.0
+    )
+
+    data_content = Data_Message(
+        fix_start = gnss_fix_start,
+        fix_end = gnss_fix_end,
+        accX = np_accX,
+        accY = np_accY,
+        accZ = np_accZ,
+        accD = np_accD,
+        press1 = np_press1,
+        press2 = np_press2,
+    )
+
+    return data_content
 
 
 def decode_file(path_to_file: Path) -> (str, type):
@@ -250,8 +365,8 @@ def decode_file(path_to_file: Path) -> (str, type):
         return ("start_file", gnss_fix)
 
     if kind == "data_file":
-        pass
-        return ("data_file", None)
+        data_content = decode_data_file(path_to_file)
+        return ("data_file", data_content)
 
 # ------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------
@@ -259,7 +374,7 @@ def decode_file(path_to_file: Path) -> (str, type):
 
 # ------------------------------------------------------------------------------------------
 # file bootfile kind
-file_to_decode_start = Path("./../data/2023-03-08-19-15.dat")
+file_to_decode_start = Path("./../data/2023-03-09-19-35.dat")
 
 (kind, data) = decode_file(file_to_decode_start)
 ic(kind)
@@ -267,49 +382,7 @@ ic(data)
 
 # ------------------------------------------------------------------------------------------
 # file datafile kind
-file_to_decode_data = Path("./../data/2023-03-08-19-21.dat")
-
-with open(file_to_decode_data, "br") as fh:
-    data = fh.read()
-
-for crrt_bstr in list_expected_strings_datafile:
-    assert crrt_bstr in data
-
-assert data.find(string_data_start_gnss_start) == 0
-
-idx_start_gnss_start = data.find(string_data_start_gnss_start_ascii) + len(string_data_start_gnss_start_ascii)
-idx_start_gnss_end = data.find(string_data_start_gnss_done_ascii)
-string_data_start_gnss = data[idx_start_gnss_start: idx_start_gnss_end]
-gnss_fix_start = decode_gnss_ascii_string(string_data_start_gnss)
-
-idx_end_gnss_start = data.find(string_data_end_gnss_start_ascii) + len(string_data_end_gnss_start_ascii)
-idx_end_gnss_end = data.find(string_data_end_gnss_done_ascii)
-string_data_end_gnss = data[idx_end_gnss_start: idx_end_gnss_end]
-gnss_fix_end = decode_gnss_ascii_string(string_data_end_gnss)
-
-data_accX = get_buffer_inbetween_strings(
-    data,
-    string_data_accx_start,
-    string_data_accx_end
-)
-
-array_uint16 = decode_uint_buffer_inbetween_strings(
-    data,
-    string_data_accx_start,
-    string_data_accx_end,
-    "H"
-)
-
-np_accX = (np.array(array_uint16, dtype=np.float32) / float_value_decode_uint16_t) * (4.0 * 9.81) - (2.0 * 9.81)
-ic(np_accX)
-
-result = Data_Message(
-    fix_start=gnss_fix_start,
-    fix_end=gnss_fix_end
-)
-
-pp.pprint(result)
-
+file_to_decode_data = Path("./../data/2023-03-09-19-42.dat")
 
 (kind, data) = decode_file(file_to_decode_data)
 ic(kind)

@@ -68,7 +68,7 @@ void DataManager::gather_dataset(void){
     uint16_t e_acc_x;
     uint16_t e_acc_y;
     uint16_t e_acc_z;
-    uint16_t e_acc_d;
+    uint32_t e_acc_d;
 
     uint32_t e_press1;
     uint32_t e_press2;

@@ -21,7 +21,7 @@ static constexpr bool use_usb {true};
 //////////////////////////////////////////////////////////////////////////////////////////
 // gnss 
 
-static constexpr bool use_usb_gnss_debug {true};
+static constexpr bool use_usb_gnss_debug {false};
 
 // timeout for getting the first fix
 static constexpr uint32_t gnss_fix_timeout_first_fix_milliseconds {1000 * 60 * 5};
