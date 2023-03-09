@@ -185,7 +185,6 @@ def denormalize_uint_array(uint_array_in: list, kind: str, range_data: float, of
         float_decode = float_value_decode_uint16_t
     elif kind == "I":
         float_decode = float_value_decode_uint32_t
-        ic(uint_array_in)
     else:
         raise RuntimeError(f"Unknown typesize kind; expect H or I, got {kind}")
 
@@ -315,7 +314,6 @@ def decode_data_file(path_to_file:Path) -> Data_Message:
         2.0 * 9.81
     )
 
-    # TODO: check / fix
     np_accD = get_decoded_denormalized_array(
         data,
         string_data_accd_start,
