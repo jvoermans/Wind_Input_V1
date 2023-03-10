@@ -130,7 +130,7 @@ uint8_t GNSS_simple_manager::get_single_fix(uint32_t timeout_milliseconds, GNSS_
         // read chars as they arrive
         char c = adafruit_gps_instance.read();
 
-        if (use_usb && use_usb_gnss_debug){
+        if (use_usb){
             SERIAL_USB->print(c);
         }
 
@@ -163,7 +163,7 @@ uint8_t GNSS_simple_manager::get_single_fix(uint32_t timeout_milliseconds, GNSS_
                 continue;
             }
 
-            if (use_usb && use_usb_gnss_debug){
+            if (use_usb){
                 SERIAL_USB->println(F("gnss fill output fix"));
             }
             // is this actually a valid fix? if yes, return
