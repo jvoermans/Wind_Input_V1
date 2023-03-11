@@ -17,7 +17,11 @@
 #include "sd_configuration.h"
 #include "sd_manager.h"
 
+#include "sensors_manager.h"
+
 #include "data_manager.h"
+
+#include "blinker.h"
 
 uint8_t status {255};
 
@@ -53,24 +57,64 @@ void setup()
         print_all_user_configs();
         wdt.restart();
     }
-
-    // turn the GNSS on and off and sleep a bit, to "warm up" (and test current use, check if anything wrong, etc)
-    gnss_simple_manager_instance.turn_on_off();
-    sleep_for_seconds(11);
+    // the 3 under are to avoid blinking the SD when the LED blinks
+    sleep_for_seconds(1);
+    sd_manager_instance.update_filename();
+    sd_manager_instance.log_boot();
 
     ////////////////////////////////////////////////////////////////////////////////
-    // TODO: CRITICAL: start / check the different sensors and the SD card to check that all looks good
+    // start tests to check all is in good order
 
-    // TODO: this is just a test, remove later on
+    // just used for testing if relevant
     if (false){
         enableBurstMode();
         delay(500);
         board_data_manager.gather_dataset();
         disableBurstMode();
         delay(500);
-        sd_manager_instance.update_filename(current_fix_start);
+        // sd_manager_instance.update_filename(current_fix_start);
+        sd_manager_instance.update_filename();
         sd_manager_instance.log_data();
     }
+
+
+    if (true){
+        // turn the GNSS on and off to "warm up" (and test current use, check if anything wrong, etc)
+        gnss_simple_manager_instance.turn_on_off();
+
+        blink(1000, 2);
+        delay(2000);
+        wdt.restart();
+
+        // turn the sensors on and off to "warm up" (and test that all is well with them)
+        board_imu_manger.start_IMU();
+        board_imu_manger.stop_IMU();
+
+        blink(1000, 4);
+        delay(2000);
+        wdt.restart();
+
+        // write a dummy start file just to check the SD card working
+        dummy_initialize_fix(current_fix_start);
+        // sd_manager_instance.update_filename(current_fix_start);
+        sd_manager_instance.update_filename();
+        sd_manager_instance.log_boot();
+
+        blink(1000, 6);
+        delay(2000);
+        wdt.restart();
+
+        // sleep to test that sleep works well and that all starts well after this
+        sleep_for_seconds(11);
+
+        blink(1000, 8);
+        delay(2000);
+        wdt.restart();
+    }
+
+    blink(500, 5);
+    delay(2000);
+    wdt.restart();
 
     ////////////////////////////////////////////////////////////////////////////////
     // init the GNSS, get the first GNSS fix;
@@ -96,6 +140,10 @@ void setup()
             SERIAL_USB->println(F("Could not find GPS fix; sleep and retry"));
         }
 
+        blink(500, 5);
+        delay(2000);
+        wdt.restart();
+
         // else sleep a bit and try again later
         sleep_for_seconds(15*60);
     }
@@ -105,7 +153,8 @@ void setup()
     if (use_usb){
         SERIAL_USB->println(F("setup write boot message"));
     }
-    sd_manager_instance.update_filename(current_fix_start);
+    // sd_manager_instance.update_filename(current_fix_start);
+    sd_manager_instance.update_filename();
     sd_manager_instance.log_boot();
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -122,6 +171,10 @@ void loop()
     if (use_usb){
         SERIAL_USB->println(F("loop start"));
     }
+
+    blink(250, 10);
+    delay(2000);
+    wdt.restart();
 
     ////////////////////////////////////////////////////////////////////////////////
     // wait / sleep until next time to start a new file
@@ -148,11 +201,7 @@ void loop()
         SERIAL_USB->println(F("get start fix"));
     }
     wdt.restart();
-    // TODO: BONUS: if too many failures, either reboot or just go further
-    while (gnss_simple_manager_instance.get_good_averaged_fix(current_fix_start) != 0){
-        delay(1000);
-        wdt.restart();
-    }
+    gnss_simple_manager_instance.get_good_averaged_fix(current_fix_start);
 
     ////////////////////////////////////////////////////////////////////////////////
     // we need to take Kalman filter etc; boost
@@ -187,18 +236,16 @@ void loop()
     if (use_usb){
         SERIAL_USB->println(F("get end fix"));
     }
-    // TODO: BONUS: if too many failures, either reboot or just go further
-    while (gnss_simple_manager_instance.get_good_averaged_fix(current_fix_end) != 0){
-        delay(1000);
-        wdt.restart();
-    }
+    gnss_simple_manager_instance.get_good_averaged_fix(current_fix_end);
 
     ////////////////////////////////////////////////////////////////////////////////
     // sd card dumping
     if (use_usb){
         SERIAL_USB->println(F("dump data"));
     }
-    sd_manager_instance.update_filename(current_fix_start);
+    // TODO: set filename from the UTC clock, not from the GNSS fix (new update_filename() function and use it instead)
+    // sd_manager_instance.update_filename(current_fix_start);
+    sd_manager_instance.update_filename();
     sd_manager_instance.log_data();
 
     wdt.restart();

@@ -27,6 +27,7 @@ struct GNSS_simple_fix {
     uint8_t day;  // natural day, 1-31, as would be written commonly
     uint8_t hour;  // natural hour, 0-23, as would be written commonly
     uint8_t minute;  // natural minute,  0-59, as would be written commonly
+    uint8_t second;  // natural second,  0-59, as would be written commonly
     int32_t latitude;
     int32_t longitude;
     // note: not sure if the latitude and longitude from adafruit library have sign or abs, add NS and EW chars...

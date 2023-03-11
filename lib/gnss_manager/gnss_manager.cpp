@@ -13,6 +13,7 @@ void dummy_initialize_fix(GNSS_simple_fix & to_initialize){
     to_initialize.day = 99;
     to_initialize.hour = 99;
     to_initialize.minute = 99;
+    to_initialize.second = 99;
     to_initialize.latitude = 99999;
     to_initialize.longitude = 99999;
     to_initialize.lat_NS = 'X';
@@ -27,6 +28,7 @@ void copy_fix(GNSS_simple_fix const & in, GNSS_simple_fix & out){
     out.day = in.day;
     out.hour = in.hour;
     out.minute = in.minute;
+    out.second = in.second;
     out.latitude = in.latitude;
     out.longitude = in.longitude;
     out.lat_NS = in.lat_NS;
@@ -163,11 +165,12 @@ uint8_t GNSS_simple_manager::get_single_fix(uint32_t timeout_milliseconds, GNSS_
                 continue;
             }
 
-            if (use_usb){
-                SERIAL_USB->println(F("gnss fill output fix"));
-            }
             // is this actually a valid fix? if yes, return
             if (adafruit_gps_instance.fix && (adafruit_gps_instance.fixquality > 0)){
+
+                if (use_usb){
+                    SERIAL_USB->println(F("gnss fill output fix"));
+                }
 
                 output_fix.validity_status = 0;
                 output_fix.year = 2000 + adafruit_gps_instance.year;
@@ -175,11 +178,12 @@ uint8_t GNSS_simple_manager::get_single_fix(uint32_t timeout_milliseconds, GNSS_
                 output_fix.day = adafruit_gps_instance.day;
                 output_fix.hour = adafruit_gps_instance.hour;
                 output_fix.minute = adafruit_gps_instance.minute;
+                output_fix.second = adafruit_gps_instance.seconds;
                 output_fix.latitude = adafruit_gps_instance.latitude_fixed;
                 output_fix.longitude = adafruit_gps_instance.longitude_fixed;
                 output_fix.lat_NS = adafruit_gps_instance.lat;
                 output_fix.lon_EW = adafruit_gps_instance.lon;
-                kiss_calendar_time calendar_time {output_fix.year, output_fix.month, output_fix.day, output_fix.hour, output_fix.minute, 0};
+                kiss_calendar_time calendar_time {output_fix.year, output_fix.month, output_fix.day, output_fix.hour, output_fix.minute, output_fix.second};
                 output_fix.posix_timestamp = calendar_to_posix(&calendar_time);
 
                 return 0;
@@ -272,6 +276,7 @@ uint8_t GNSS_simple_manager::get_good_averaged_fix(GNSS_simple_fix & output_fix)
     output_fix.day = calendar_time_out.day;
     output_fix.hour = calendar_time_out.hour;
     output_fix.minute = calendar_time_out.minute;
+    output_fix.second = calendar_time_out.second;
 
     if (use_usb){
         SERIAL_USB->println(F("--- gnss good average fix start"));
@@ -281,6 +286,7 @@ uint8_t GNSS_simple_manager::get_good_averaged_fix(GNSS_simple_fix & output_fix)
         PRINTLN_VAR(output_fix.day);
         PRINTLN_VAR(output_fix.hour);
         PRINTLN_VAR(output_fix.minute);
+        PRINTLN_VAR(output_fix.second);
         PRINTLN_VAR(output_fix.latitude);
         PRINTLN_VAR(output_fix.lat_NS);
         PRINTLN_VAR(output_fix.longitude);

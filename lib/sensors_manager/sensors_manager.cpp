@@ -97,7 +97,7 @@ bool IMU_Manager::start_IMU(){
   time_last_IMU_update_us = micros();
 
   // let a bit of time for the filter to converge; 10 s at 100Hz is 100 updates
-  for (int i=0; i<100; i++){
+  for (int i=0; i<600; i++){
    get_new_reading(dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout, dummy_inout);
    wdt.restart();
   }
@@ -110,6 +110,12 @@ bool IMU_Manager::stop_IMU(){
    delay(100);
 
    pinMode(LED_BUILTIN, INPUT);
+  
+  ism330dhcx.reset();
+  wdt.restart();
+  
+  bmp390_1.reset();
+  wdt.restart();
 
    return true;
 }

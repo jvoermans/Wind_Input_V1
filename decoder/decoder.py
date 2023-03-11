@@ -55,6 +55,8 @@ class Data_Message:
     accY: np.ndarray
     accZ: np.ndarray
     accD: np.ndarray
+    pitch: np.ndarray
+    roll: np.ndarray
     press1: np.ndarray
     press2: np.ndarray
 
@@ -64,8 +66,9 @@ class Data_Message:
 
 # for files of kind data
 
-n_samples_per_buffer = 20 * 8 * 60 + 1
-np_data_length = 20 * 8 * 60
+n_mins_logging = 6
+n_samples_per_buffer = 20 * n_mins_logging * 60 + 1
+np_data_length = 20 * n_mins_logging * 60
 
 local_timebase_s = np.arange(0.0, np_data_length * 1.0 / 20.0, 1.0 / 20.0)
 
@@ -89,6 +92,12 @@ string_data_accy_end = b"\n\naccY_array_done\n\n\n\n"
 
 string_data_accz_start = b"accZ_array\n\n"
 string_data_accz_end = b"\n\naccZ_array_done\n\n\n\n"
+
+string_data_pitch_start = b"pitch_array\n\n"
+string_data_pitch_end = b"\n\npitch_array_done\n\n\n\n"
+
+string_data_roll_start = b"roll_array\n\n"
+string_data_roll_end = b"\n\nroll_array_done\n\n\n\n"
 
 string_data_accd_start = b"accD_array\n\n"
 string_data_accd_end = b"\n\naccD_array_done\n\n\n\n"
@@ -115,6 +124,10 @@ list_expected_strings_datafile = [
     string_data_accy_end,
     string_data_accz_start,
     string_data_accz_end,
+    string_data_pitch_start,
+    string_data_pitch_end,
+    string_data_roll_start,
+    string_data_roll_end,
     string_data_accd_start,
     string_data_accd_end,
     string_data_press1_start,
@@ -221,15 +234,15 @@ def identify_file_kind(path_to_file: Path) -> str:
 def decode_gnss_ascii_string(gnss_ascii_string: str) -> GNSS_Packet:
     gnss_ascii_fields = gnss_ascii_string.replace(b"\n", b"").split(b"\r")
 
-    assert gnss_ascii_fields[6] in [b"N", b"S"]
-    assert gnss_ascii_fields[8] in [b"E", b"W"]
+    assert gnss_ascii_fields[7] in [b"N", b"S"]
+    assert gnss_ascii_fields[9] in [b"E", b"W"]
 
-    if gnss_ascii_fields[6] == b"N":
+    if gnss_ascii_fields[7] == b"N":
         sign_lat = 1.0
     else:
         sign_lat = -1.0
 
-    if gnss_ascii_fields[8] == b"E":
+    if gnss_ascii_fields[9] == b"E":
         sign_lon = 1.0
     else:
         sign_lon = -1.0
@@ -241,10 +254,11 @@ def decode_gnss_ascii_string(gnss_ascii_string: str) -> GNSS_Packet:
             int(gnss_ascii_fields[2]),
             int(gnss_ascii_fields[3]),
             int(gnss_ascii_fields[4]),
-            0, 0, tzinfo=datetime.timezone.utc
+            int(gnss_ascii_fields[5]),
+            0, tzinfo=datetime.timezone.utc
         ),
-        latitude = sign_lat * float(gnss_ascii_fields[5]) / 1e7,
-        longitude = sign_lon * float(gnss_ascii_fields[7]) / 1e7,
+        latitude = sign_lat * float(gnss_ascii_fields[6]) / 1e7,
+        longitude = sign_lon * float(gnss_ascii_fields[8]) / 1e7,
     )
 
     return result_fix
@@ -317,6 +331,24 @@ def decode_data_file(path_to_file:Path) -> Data_Message:
         2.0 * 9.81
     )
 
+    np_pitch = get_decoded_denormalized_array(
+        data,
+        string_data_pitch_start,
+        string_data_pitch_end,
+        "H",
+        2.0 * 360.0,
+        360.0
+    )
+
+    np_roll = get_decoded_denormalized_array(
+        data,
+        string_data_roll_start,
+        string_data_roll_end,
+        "H",
+        2.0 * 360.0,
+        360.0
+    )
+
     np_accD = get_decoded_denormalized_array(
         data,
         string_data_accd_start,
@@ -350,6 +382,8 @@ def decode_data_file(path_to_file:Path) -> Data_Message:
         accX = np_accX,
         accY = np_accY,
         accZ = np_accZ,
+        pitch = np_pitch,
+        roll = np_roll,
         accD = np_accD,
         press1 = np_press1,
         press2 = np_press2,

@@ -51,7 +51,8 @@ static constexpr uint32_t file_start_modulo_seconds {10 * 60};
 // how long duration we actually log
 // should be a bit less than the interval between files due to the start modulo, to allow for bookkeeping etc
 // ie to log for 8 minutes at a time per file: 8 * 60
-static constexpr uint32_t file_log_duration_seconds {8 * 60};
+// NOTE: reduced to 6 mins, was getting some crashes, wondering if because of low RAM
+static constexpr uint32_t file_log_duration_seconds {6 * 60};
 // TODO: uncomment under when file_start_modulo_seconds is for true values, comment for tests
 static_assert(file_start_modulo_seconds > (file_log_duration_seconds + 60));
 
@@ -61,7 +62,7 @@ static constexpr size_t samples_per_channel_per_file {file_log_duration_seconds 
 // assert this uses less than 75% RAM
 // total RAM is 384kB, max use for data storing of 288kB (increase to 290k)
 // the (+) is the number of bytes per reading: sum of individual element types in data_manager.h vectors
-static_assert((2+2+2+4+4+4) * samples_per_channel_per_file < 290'000);
+static_assert((2+2+2+2+2+2+2+2+4+4+4) * samples_per_channel_per_file < 290'000);
 
 static constexpr float data_manager_debug {true};
 

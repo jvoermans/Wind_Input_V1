@@ -14,10 +14,16 @@
 
 #include "data_manager.h"
 
+#include "time_manager.h"
+#include "kiss_posix_time_utils.hpp"
+
 class SD_Manager{
     public:
         // filename is in the format YYYY-MM-DD-HH-MM.dat
         void update_filename(GNSS_simple_fix const & fix_in);
+
+        // update filename based on the UTC clock value
+        void update_filename();
 
         // write a boot log message
         void log_boot(void);

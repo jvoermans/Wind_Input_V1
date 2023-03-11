@@ -95,6 +95,33 @@ void SD_Manager::update_filename(GNSS_simple_fix const &fix_in)
     sd_filename[20] = '\0';
 }
 
+void SD_Manager::update_filename()
+{
+    kiss_calendar_time crrt_calendar_time;
+    posix_to_calendar(board_time_manager.get_posix_timestamp(), &crrt_calendar_time);
+
+    // YYYY- (5 chars)
+    snprintf(&(sd_filename[0]), 4 + 1, "%04u", crrt_calendar_time.year);
+    sd_filename[4] = '-';
+    // MM- (3 chars)
+    snprintf(&(sd_filename[5]), 2 + 1, "%02u", crrt_calendar_time.month);
+    sd_filename[7] = '-';
+    // DD- (3 chars)
+    snprintf(&(sd_filename[8]), 2 + 1, "%02u", crrt_calendar_time.day);
+    sd_filename[10] = '-';
+    // HH- (3 chars)
+    snprintf(&(sd_filename[11]), 2 + 1, "%02u", crrt_calendar_time.hour);
+    sd_filename[13] = '-';
+    // MM. (3 chars)
+    snprintf(&(sd_filename[14]), 2 + 1, "%02u", crrt_calendar_time.minute);
+    sd_filename[16] = '.';
+    // .dat
+    sd_filename[17] = 'd';
+    sd_filename[18] = 'a';
+    sd_filename[19] = 't';
+    sd_filename[20] = '\0';
+}
+
 void SD_Manager::log_boot(void){
     start();
     delay(100);
@@ -109,6 +136,7 @@ void SD_Manager::log_boot(void){
     sd_file.println(current_fix_start.day);
     sd_file.println(current_fix_start.hour);
     sd_file.println(current_fix_start.minute);
+    sd_file.println(current_fix_start.second);
     sd_file.println(current_fix_start.latitude);
     sd_file.println(current_fix_start.lat_NS);
     sd_file.println(current_fix_start.longitude);
@@ -147,6 +175,7 @@ void SD_Manager::log_data(void){
     sd_file.println(current_fix_start.day);
     sd_file.println(current_fix_start.hour);
     sd_file.println(current_fix_start.minute);
+    sd_file.println(current_fix_start.second);
     sd_file.println(current_fix_start.latitude);
     sd_file.println(current_fix_start.lat_NS);
     sd_file.println(current_fix_start.longitude);
@@ -159,6 +188,7 @@ void SD_Manager::log_data(void){
     sd_file.println(current_fix_end.day);
     sd_file.println(current_fix_end.hour);
     sd_file.println(current_fix_end.minute);
+    sd_file.println(current_fix_end.second);
     sd_file.println(current_fix_end.latitude);
     sd_file.println(current_fix_end.lat_NS);
     sd_file.println(current_fix_end.longitude);
@@ -186,6 +216,20 @@ void SD_Manager::log_data(void){
     sd_file.write((void *)(accZ.data()), sizeof(uint16_t) * accZ.max_size());
     wdt.restart();
     sd_file.print(F("\n\naccZ_array_done\n\n\n\n"));
+    wdt.restart();
+
+    sd_file.print(F("pitch_array\n\n"));
+    wdt.restart();
+    sd_file.write((void *)(pitch.data()), sizeof(uint16_t) * pitch.max_size());
+    wdt.restart();
+    sd_file.print(F("\n\npitch_array_done\n\n\n\n"));
+    wdt.restart();
+
+    sd_file.print(F("roll_array\n\n"));
+    wdt.restart();
+    sd_file.write((void *)(roll.data()), sizeof(uint16_t) * roll.max_size());
+    wdt.restart();
+    sd_file.print(F("\n\nroll_array_done\n\n\n\n"));
     wdt.restart();
 
     sd_file.print(F("accD_array\n\n"));
