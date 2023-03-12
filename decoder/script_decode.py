@@ -9,6 +9,8 @@ from icecream import ic
 
 import matplotlib.pyplot as plt
 
+import datetime
+
 print("***** Put the interpreter in UTC, to make sure no TZ issues")
 os.environ["TZ"] = "UTC"
 time.tzset()
@@ -31,7 +33,7 @@ for crrt_file in basepath.glob("*.dat"):
     # a bit of plotting in case this is a data file;
     # plot the 2 most important things: accD and press1
     if kind == "data_file":
-        time_start = data.fix_start.datetime_fix
+        time_start = data.fix_end.datetime_fix - datetime.timedelta(minutes=6)
 
         plt.figure()
         plt.plot(local_timebase_s, data.accD)

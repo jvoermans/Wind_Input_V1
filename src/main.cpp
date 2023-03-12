@@ -204,11 +204,12 @@ void loop()
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get start of file lat, lon, time
-    if (use_usb){
-        SERIAL_USB->println(F("get start fix"));
-    }
-    wdt.restart();
-    gnss_simple_manager_instance.get_good_averaged_fix(current_fix_start);
+    // if (use_usb){
+    //     SERIAL_USB->println(F("get start fix"));
+    // }
+    // wdt.restart();
+    // gnss_simple_manager_instance.get_good_averaged_fix(current_fix_start);
+    dummy_initialize_fix(current_fix_start);
 
     ////////////////////////////////////////////////////////////////////////////////
     // we need to take Kalman filter etc; boost
@@ -240,12 +241,12 @@ void loop()
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get end of file lat, lon, time
-    dummy_initialize_fix(current_fix_end);
-    // NOTE: drop it, we will get a new fix soon anyways
-    // if (use_usb){
-    //     SERIAL_USB->println(F("get end fix"));
-    // }
-    // gnss_simple_manager_instance.get_good_averaged_fix(current_fix_end);
+    // for some reason, the utc clock way of doing here has some issues; set this GPS instead of the start one
+    // dummy_initialize_fix(current_fix_end);
+    if (use_usb){
+        SERIAL_USB->println(F("get end fix"));
+    }
+    gnss_simple_manager_instance.get_good_averaged_fix(current_fix_end);
 
     ////////////////////////////////////////////////////////////////////////////////
     // sd card dumping
