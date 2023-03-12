@@ -25,7 +25,10 @@ basepath = Path("../data/")
 # for crrt_file in basepath.glob("*.dat"):
 
 # go through a single interesting file instead
-with basepath / "2023-03-12-18-57.dat" as crrt_file:
+single_file = "2023-03-12-18-57.dat"  # some interesting data
+# single_file = "2023-03-12T19-17-11.dat"  # new filename boot
+# single_file = "2023-03-12T19-38-19.dat"  # new filename data
+with basepath / single_file as crrt_file:
     ic(crrt_file)
 
     # actually decode
