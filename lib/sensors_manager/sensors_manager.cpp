@@ -50,19 +50,19 @@ bool IMU_Manager::start_IMU(){
   delay(5);
   Serial.println(F("bmp390 1 started"));
 
-  // TODO: take on and off for 1 or 2 sensors
-  // Serial.println(F("start bmp390 2"));
-  // while (!bmp390_2.begin(FORCED_MODE, 0x77)){
-  //   Serial.println(F("issue bmp390 2"));
-  //   delay(500);
-  // }
-  // bmp390_2.setTimeStandby(TIME_STANDBY_5MS);
-  // bmp390_2.setPresOversampling(OVERSAMPLING_X16);
-  // bmp390_2.setTempOversampling(OVERSAMPLING_X2);
-  // bmp390_2.setIIRFilter(IIR_FILTER_OFF);
-  // wdt.restart();
-  // delay(5);
-  // Serial.println(F("bmp390 2 started"));
+  Serial.println(F("start bmp390 2"));
+  while (!bmp390_2.begin(FORCED_MODE, 0x76)){
+    Serial.println(F("issue bmp390 2"));
+    delay(500);
+  }
+  bmp390_2.setTimeStandby(TIME_STANDBY_5MS);
+  bmp390_2.setPresOversampling(OVERSAMPLING_X16);
+  bmp390_2.setTempOversampling(OVERSAMPLING_X2);
+  bmp390_2.setIIRFilter(IIR_FILTER_OFF);
+  wdt.restart();
+  delay(5);
+  Serial.println(F("bmp390 2 started"));
+
 
 //   Serial.println(F("Adafruit LIS3MDL start!"));
 //   while (true){
@@ -89,6 +89,7 @@ bool IMU_Manager::start_IMU(){
   wdt.restart();
 
   bmp390_1.startForcedConversion();
+  bmp390_2.startForcedConversion();
   delay(100);
 
   time_last_accel_gyro_reading_us = micros();
@@ -115,6 +116,7 @@ bool IMU_Manager::stop_IMU(){
   wdt.restart();
   
   bmp390_1.reset();
+  bmp390_2.reset();
   wdt.restart();
 
    return true;
@@ -506,10 +508,13 @@ bool IMU_Manager::get_new_reading(float & acc_N_inout, float & acc_E_inout, floa
         // Serial.println(micros());
       }
       if (loop_step == 2){
-        // TODO: take on and off for 1 or 2 sensors
-        // bmp390_2.getPressure(press_2);
-        // press_2_inout = press_2;
-        // bmp390_2.startForcedConversion();
+        // Serial.println(F("start press stuff"));
+        // Serial.println(micros());
+        bmp390_2.getPressure(press_2);
+        // Serial.println(micros());
+        press_2_inout = press_2;
+        bmp390_2.startForcedConversion();
+        // Serial.println(micros());
       }
 
       loop_step += 1;
