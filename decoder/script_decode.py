@@ -22,7 +22,10 @@ time.tzset()
 basepath = Path("../data/")
 
 # go through all data files
-for crrt_file in basepath.glob("*.dat"):
+# for crrt_file in basepath.glob("*.dat"):
+
+# go through a single interesting file instead
+with basepath / "2023-03-12-18-57.dat" as crrt_file:
     ic(crrt_file)
 
     # actually decode
@@ -33,6 +36,8 @@ for crrt_file in basepath.glob("*.dat"):
     # a bit of plotting in case this is a data file;
     # plot the 2 most important things: accD and press1
     if kind == "data_file":
+        # use the fix_end, and remove the typical duration of the measurement, to get typical time start
+        # if need to be really precise, time start is the closest to minute % 10 == 0, that is just before the following
         time_start = data.fix_end.datetime_fix - datetime.timedelta(minutes=6)
 
         plt.figure()

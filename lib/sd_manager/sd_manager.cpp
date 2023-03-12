@@ -112,14 +112,17 @@ void SD_Manager::update_filename()
     // HH- (3 chars)
     snprintf(&(sd_filename[11]), 2 + 1, "%02u", crrt_calendar_time.hour);
     sd_filename[13] = '-';
-    // MM. (3 chars)
+    // MM- (3 chars)
     snprintf(&(sd_filename[14]), 2 + 1, "%02u", crrt_calendar_time.minute);
-    sd_filename[16] = '.';
+    sd_filename[16] = '-';
+    // SS. (3 chars)
+    snprintf(&(sd_filename[17]), 2 + 1, "%02u", crrt_calendar_time.second);
+    sd_filename[19] = '.';
     // .dat
-    sd_filename[17] = 'd';
-    sd_filename[18] = 'a';
-    sd_filename[19] = 't';
-    sd_filename[20] = '\0';
+    sd_filename[20] = 'd';
+    sd_filename[21] = 'a';
+    sd_filename[22] = 't';
+    sd_filename[23] = '\0';
 }
 
 void SD_Manager::log_boot(void){

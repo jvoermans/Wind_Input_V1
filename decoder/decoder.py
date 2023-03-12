@@ -60,6 +60,7 @@ class Data_Message:
     roll: np.ndarray
     press1: np.ndarray
     press2: np.ndarray
+    loopidx: int
 
 # ------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------
@@ -318,6 +319,10 @@ def decode_data_file(path_to_file:Path) -> Data_Message:
 
     assert data.find(string_data_start_gnss_start) == 0
 
+    idx_start_loopidx = data.find(string_loopidx_start) + len(string_loopidx_start)
+    idx_end_loopidx = data.find(string_loopidx_done)
+    loopidx = int(data[idx_start_loopidx:idx_end_loopidx])
+
     idx_start_gnss_start = data.find(string_data_start_gnss_start_ascii) + len(string_data_start_gnss_start_ascii)
     idx_start_gnss_end = data.find(string_data_start_gnss_done_ascii)
     string_data_start_gnss = data[idx_start_gnss_start: idx_start_gnss_end]
@@ -411,6 +416,7 @@ def decode_data_file(path_to_file:Path) -> Data_Message:
         accD = np_accD,
         press1 = np_press1,
         press2 = np_press2,
+        loopidx = loopidx
     )
 
     return data_content
