@@ -115,7 +115,7 @@ uint8_t GNSS_simple_manager::turn_off(void){
     return 0;
 }
 
-uint8_t GNSS_simple_manager::get_single_fix(uint32_t timeout_milliseconds, GNSS_simple_fix & output_fix){
+uint8_t GNSS_simple_manager::get_single_fix(uint32_t const timeout_milliseconds, GNSS_simple_fix & output_fix){
     dummy_initialize_fix(output_fix);
 
     uint32_t start = millis();

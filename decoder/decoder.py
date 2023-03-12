@@ -45,6 +45,7 @@ class GNSS_Packet:
     datetime_fix: datetime.datetime
     latitude: float
     longitude: float
+    valid: bool
 
 
 @dataclass
@@ -78,6 +79,9 @@ float_value_decode_uint32_t = 4294900000.0
 string_data_start_gnss_start = b"\n\nDATA\n\n\n\nGNSS_start\n\n"
 string_data_start_gnss_done_end_gnss_start = b"\n\nGNSS_start_done\n\n\n\nGNSS_end\n\n"
 string_data_end_gnss_done = b"\n\nGNSS_end_done\n\n\n\n"
+
+string_loopidx_start = b"loopidx_start_string\n\n"
+string_loopidx_done = b"\n\nloopidx_done\n\n\n\n"
 
 string_data_start_gnss_start_ascii = b"GNSS_start_string\n\n"
 string_data_start_gnss_done_ascii = b"\n\nGNSS_start_string_done\n\n\n\n"
@@ -114,6 +118,8 @@ list_expected_strings_datafile = [
     string_data_start_gnss_start,
     string_data_start_gnss_done_end_gnss_start,
     string_data_end_gnss_done,
+    string_loopidx_start,
+    string_loopidx_done,
     string_data_start_gnss_start_ascii,
     string_data_start_gnss_done_ascii,
     string_data_end_gnss_start_ascii,
@@ -234,8 +240,25 @@ def identify_file_kind(path_to_file: Path) -> str:
 def decode_gnss_ascii_string(gnss_ascii_string: str) -> GNSS_Packet:
     gnss_ascii_fields = gnss_ascii_string.replace(b"\n", b"").split(b"\r")
 
-    assert gnss_ascii_fields[7] in [b"N", b"S"]
-    assert gnss_ascii_fields[9] in [b"E", b"W"]
+    assert gnss_ascii_fields[7] in [b"N", b"S", b"X"]
+    assert gnss_ascii_fields[9] in [b"E", b"W", b"X"]
+
+    if gnss_ascii_fields[7] == b"X" or gnss_ascii_fields[9] == b"X":
+        result_fix = GNSS_Packet(
+            datetime_fix = datetime.datetime(
+                1970,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0, tzinfo=datetime.timezone.utc
+            ),
+            latitude = 0.0,
+            longitude = 0.0,
+            valid = False,
+        )
+        return result_fix
 
     if gnss_ascii_fields[7] == b"N":
         sign_lat = 1.0
@@ -259,6 +282,7 @@ def decode_gnss_ascii_string(gnss_ascii_string: str) -> GNSS_Packet:
         ),
         latitude = sign_lat * float(gnss_ascii_fields[6]) / 1e7,
         longitude = sign_lon * float(gnss_ascii_fields[8]) / 1e7,
+        valid = True,
     )
 
     return result_fix

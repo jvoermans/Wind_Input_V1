@@ -54,4 +54,6 @@ class DataManager {
 
 extern DataManager board_data_manager;
 
+extern uint32_t loop_idx;
+
 #endif

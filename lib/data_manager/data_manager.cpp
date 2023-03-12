@@ -18,6 +18,8 @@ etl::vector<uint16_t, samples_per_channel_per_file + 1> roll;
 etl::vector<uint32_t, samples_per_channel_per_file + 1> press1;
 etl::vector<uint32_t, samples_per_channel_per_file + 1> press2;
 
+uint32_t loop_idx {0};
+
 DataManager board_data_manager;
 
 void DataManager::clear_data(void){

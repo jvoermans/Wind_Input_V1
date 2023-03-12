@@ -47,9 +47,5 @@ for crrt_file in basepath.glob("*.dat"):
 
         plt.show()
 
-        # accD
-
-        # press1
-
     print("")
 

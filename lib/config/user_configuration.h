@@ -24,7 +24,8 @@ static constexpr bool use_usb {true};
 static constexpr bool use_usb_gnss_debug {false};
 
 // timeout for getting the first fix
-static constexpr uint32_t gnss_fix_timeout_first_fix_milliseconds {1000 * 60 * 5};
+// NOTE: making it global mutable, dangerous, but quickfix for adapting it without API changes
+static uint32_t gnss_fix_timeout_first_fix_milliseconds {1000 * 60 * 5};
 // static constexpr uint32_t gnss_fix_timeout_first_fix_milliseconds {1000 * 5};
 // timeout for subsequent fixes
 static constexpr uint32_t gnss_fix_timeout_subsequent_fix_milliseconds {1000 * 10};

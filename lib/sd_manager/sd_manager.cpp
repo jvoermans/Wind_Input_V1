@@ -169,6 +169,10 @@ void SD_Manager::log_data(void){
     delay(100);
     wdt.restart();
 
+    sd_file.print(F("loopidx_start_string\n\n"));
+    sd_file.print(loop_idx);
+    sd_file.write("\n\nloopidx_done\n\n\n\n");
+
     sd_file.print(F("GNSS_start_string\n\n"));
     sd_file.println(current_fix_start.year);
     sd_file.println(current_fix_start.month);

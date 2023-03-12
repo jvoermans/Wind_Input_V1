@@ -75,7 +75,7 @@ class GNSS_simple_manager{
 
         // get a single fix, with the GNSS already activated, within a timeout
         // this assumes that the GNSS is already turned on, and does not turn off the GNSS once a fix is gotten
-        uint8_t get_single_fix(uint32_t timeout_milliseconds, GNSS_simple_fix & output_fix);
+        uint8_t get_single_fix(uint32_t const timeout_milliseconds, GNSS_simple_fix & output_fix);
 
         etl::vector<int32_t, gnss_number_fixes_to_compute_good> accumulator_latitude;
         etl::vector<int32_t, gnss_number_fixes_to_compute_good> accumulator_longitude;

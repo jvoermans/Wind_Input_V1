@@ -128,6 +128,8 @@ void setup()
 
     status = 255;
 
+    gnss_fix_timeout_first_fix_milliseconds = 1000 * 60 * 5;
+
     while (true){
         status = gnss_simple_manager_instance.get_good_averaged_fix(current_fix_start);
         
@@ -162,6 +164,11 @@ void setup()
     if (use_usb){
         SERIAL_USB->println(F("setup done"));
     }
+
+    // reduce to 2 mins the fix max time
+    gnss_fix_timeout_first_fix_milliseconds = 1000 * 60 * 3;
+
+    loop_idx = 0;
 }
 
 void loop()
@@ -233,10 +240,12 @@ void loop()
 
     ////////////////////////////////////////////////////////////////////////////////
     // get a GPS fix to get end of file lat, lon, time
-    if (use_usb){
-        SERIAL_USB->println(F("get end fix"));
-    }
-    gnss_simple_manager_instance.get_good_averaged_fix(current_fix_end);
+    dummy_initialize_fix(current_fix_end);
+    // NOTE: drop it, we will get a new fix soon anyways
+    // if (use_usb){
+    //     SERIAL_USB->println(F("get end fix"));
+    // }
+    // gnss_simple_manager_instance.get_good_averaged_fix(current_fix_end);
 
     ////////////////////////////////////////////////////////////////////////////////
     // sd card dumping
@@ -256,4 +265,6 @@ void loop()
     }
     delay(100);
     wdt.restart();
+
+    loop_idx += 1;
 }
