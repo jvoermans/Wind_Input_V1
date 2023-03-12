@@ -106,15 +106,15 @@ void SD_Manager::update_filename()
     // MM- (3 chars)
     snprintf(&(sd_filename[5]), 2 + 1, "%02u", crrt_calendar_time.month);
     sd_filename[7] = '-';
-    // DD- (3 chars)
+    // DDT (3 chars)
     snprintf(&(sd_filename[8]), 2 + 1, "%02u", crrt_calendar_time.day);
-    sd_filename[10] = '-';
+    sd_filename[10] = 'T';
     // HH- (3 chars)
     snprintf(&(sd_filename[11]), 2 + 1, "%02u", crrt_calendar_time.hour);
-    sd_filename[13] = '-';
+    sd_filename[13] = ':';
     // MM- (3 chars)
     snprintf(&(sd_filename[14]), 2 + 1, "%02u", crrt_calendar_time.minute);
-    sd_filename[16] = '-';
+    sd_filename[16] = ':';
     // SS. (3 chars)
     snprintf(&(sd_filename[17]), 2 + 1, "%02u", crrt_calendar_time.second);
     sd_filename[19] = '.';
