@@ -25,7 +25,8 @@ basepath = Path("../data/")
 # for crrt_file in basepath.glob("*.dat"):
 
 # go through a single interesting file instead
-single_file = "2023-03-12-18-57.dat"  # some interesting data
+# single_file = "2023-03-12-18-57.dat"  # some interesting data
+single_file = "2023-03-12T22-48-38.dat"  # newest from Joey
 # single_file = "2023-03-12T19-17-11.dat"  # new filename boot
 # single_file = "2023-03-12T19-38-19.dat"  # new filename data
 with basepath / single_file as crrt_file:
@@ -48,12 +49,21 @@ with basepath / single_file as crrt_file:
         plt.xlabel(f"seconds since {time_start}")
         plt.ylabel("accD [m/s2]")
         plt.tight_layout()
+        plt.savefig("accD.png")
 
         plt.figure()
         plt.plot(local_timebase_s, data.press1)
         plt.xlabel(f"seconds since {time_start}")
         plt.ylabel("press1 [hPa]")
         plt.tight_layout()
+        plt.savefig("press1.png")
+        
+        plt.figure()
+        plt.plot(local_timebase_s, data.press2)
+        plt.xlabel(f"seconds since {time_start}")
+        plt.ylabel("press2 [hPa]")
+        plt.tight_layout()
+        plt.savefig("press2.png")
 
         plt.show()
 
