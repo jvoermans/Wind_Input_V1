@@ -15,6 +15,12 @@ print("***** Put the interpreter in UTC, to make sure no TZ issues")
 os.environ["TZ"] = "UTC"
 time.tzset()
 
+print("")
+print("--- NOTE ---")
+print("here we extract only a few fields, more data are available if needed")
+print("see the decoder.py Data_Message content for more information about fields")
+print("")
+
 # ------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------
 
@@ -25,6 +31,8 @@ basepath = Path("/home/jrmet/Downloads/2023_05_19_Data/2023_05_19_Final")
 for crrt_file in sorted(list(basepath.glob("*.dat"))):
     with basepath / crrt_file as crrt_file:
         ic(crrt_file)
+        crrt_file_csv = Path(str(crrt_file)[0:-3] + "csv")
+        ic(crrt_file_csv)
 
         bytesize = crrt_file.stat().st_size
         if bytesize < 100e3:
@@ -68,6 +76,12 @@ for crrt_file in sorted(list(basepath.glob("*.dat"))):
             plt.savefig("press2.png")
 
             plt.show()
+
+            with open(crrt_file_csv, "w") as fh:
+                fh.write("timestamp, accD, press1, press2\n")
+                for crrt_local_timebase_s, crrt_accD, crrt_press1, crrt_press2 in zip(local_timebase_s, data.accD, data.press1, data.press2):
+                    crrt_time = (time_start + datetime.timedelta(seconds=crrt_local_timebase_s)).isoformat()
+                    fh.write(f"{crrt_time},{crrt_accD},{crrt_press1},{crrt_press2}\n")
 
         print("")
 
