@@ -77,6 +77,8 @@ for crrt_file in sorted(list(basepath.glob("*.dat"))):
 
             plt.show()
 
+            # NOTE: example of how to dump as csv; note that more information are available in the python objects
+            # (can be added to the CSVs if needed)
             with open(crrt_file_csv, "w") as fh:
                 fh.write("timestamp, accD, press1, press2\n")
                 for crrt_local_timebase_s, crrt_accD, crrt_press1, crrt_press2 in zip(local_timebase_s, data.accD, data.press1, data.press2):
