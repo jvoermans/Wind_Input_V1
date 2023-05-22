@@ -406,7 +406,7 @@ def decode_data_file(path_to_file:Path) -> Data_Message:
     )
 
     data_content = Data_Message(
-        fix_start = gnss_fix_start,
+        fix_start = None,  # not used at the present time
         fix_end = gnss_fix_end,
         accX = np_accX,
         accY = np_accY,

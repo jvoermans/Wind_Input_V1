@@ -22,9 +22,14 @@ time.tzset()
 basepath = Path("/home/jrmet/Downloads/2023_05_19_Data/2023_05_19_Final")
 
 # go through all data files
-for crrt_file in basepath.glob("*.dat"):
+for crrt_file in sorted(list(basepath.glob("*.dat"))):
     with basepath / crrt_file as crrt_file:
         ic(crrt_file)
+
+        bytesize = crrt_file.stat().st_size
+        if bytesize < 100e3:
+            print("small file, likely empty of corrupted, skip")
+            continue
 
         # actually decode
         kind, data = decode_file(crrt_file)
