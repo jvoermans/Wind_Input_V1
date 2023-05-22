@@ -40,8 +40,11 @@ for crrt_file in sorted(list(basepath.glob("*.dat"))):
         # plot the 2 most important things: accD and press1
         if kind == "data_file":
             # use the fix_end, and remove the typical duration of the measurement, to get typical time start
-            # if need to be really precise, time start is the closest to minute % 10 == 0, that is just before the following
             time_start = data.fix_end.datetime_fix - datetime.timedelta(minutes=6)
+            # if need to be really precise, time start is the closest preceding minute % 10 == 0, due to GNSS acquisition time
+            # since the duration of a measurement is 6 mins, and the times when measurements start is on UTC multiples of 10 minutes
+            time_start = time_start.replace(minute=time_start.minute - (time_start.minute % 10), second = 0)
+            ic(time_start)
 
             plt.figure()
             plt.plot(local_timebase_s, data.accD)
